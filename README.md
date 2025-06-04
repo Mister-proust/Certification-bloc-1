@@ -7,4 +7,5 @@ Afin d'identifier les effets à plus ou moins long terme, ainsi que sur la faune
 Scrapping : https://www.sagepesticides.qc.ca/Recherche/RechercheMatiere
 
 
-API : 
+API : https://hubeau.eaufrance.fr/page/api-vente-et-achat-de-produits-phytopharmaceutiques#/Achat/getAchatSubstance
+

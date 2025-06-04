@@ -1,3 +1,7 @@
 pandas
 requests 
 beautifulsoup4
+SQLAlchemy
+tqdm
+psycopg2-binary
+python-dotenv
