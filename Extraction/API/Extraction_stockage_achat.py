@@ -198,7 +198,7 @@ def main():
         print(f" Récupération des données et stockage en {total_duration/60:.1f} minutes")
         
     except Exception as e:
-        print(f"\n❌ ERREUR: {e}")
+        print(f"Problème dans le script: {e}")
         raise
 
 if __name__ == "__main__":
