@@ -183,6 +183,12 @@ def export_to_postgres(df, table_name: str, schema: str):
 def main():
     total_start_time = time.time()
     schema = "Pollution_Cancer"
+    print("USER =", DB_CONFIG['user'])
+    print("PASSWORD =", DB_CONFIG['password'])
+    print("HOST =", DB_CONFIG['host'])
+    print("PORT =", DB_CONFIG['port'])
+    print("DATABASE =", DB_CONFIG['database'])
+
 
     try:
         df_produits = get_data("produits", annee_min=2013, annee_max=2025)
