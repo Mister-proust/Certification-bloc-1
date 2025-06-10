@@ -27,6 +27,20 @@ df_metadata = pd.read_csv("../../data/metadata_eff_pop.csv", sep=";")
 
 df = df[df["GEO_OBJECT"] == "DEP"]
 
+df_metadata["index"] = df_metadata.index
+
+df_metadata = df_metadata[~((df_metadata["COD_VAR"] == "GEO") & (df_metadata["index"] > 174))]
+
+df_metadata = df_metadata.drop(columns=["index"])
+
+df_metadata.loc[(df_metadata["COD_VAR"] == "AGE") & (df_metadata["COD_MOD"] == "_T"),"COD_MOD"] = "_Ta"
+
+df_metadata.loc[(df_metadata["COD_VAR"] == "GEO") & (df_metadata["COD_MOD"] == "F"),"COD_MOD"] = "Fr"
+
+df.loc[(df["AGE"] == "_T"),"AGE"] = "_Ta"
+
+df.loc[(df["GEO"] == "F"),"GEO"] = "Fr"
+
 df= df.rename(columns={
     "GEO": "Num_dep",
     "SEX" : "Sexe",
@@ -36,6 +50,8 @@ df= df.rename(columns={
     "OBS_STATUS_FR": "Chiffre_def",
     "TIME_PERIOD": "Annee",
     "OBS_VALUE": "Effectif" })
+
+
 
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
 
