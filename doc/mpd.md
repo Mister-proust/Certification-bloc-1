@@ -31,6 +31,7 @@ erDiagram
         COD_MOD varchar(128) "PK"
         LIB_MOD varchar(24) ""  
     }
+
     Produits_vente{
         id_produits_vente int8 "PK"
         amm int8 "FK"
@@ -54,8 +55,8 @@ erDiagram
         nom_substance varchar(64) ""
         département varchar(32) ""
         quantite_en_kg float8 ""
-
     }
+
     amm_mention_danger{
         id_amm_danger int8 "PK"
         amm int8 "FK"
@@ -63,6 +64,7 @@ erDiagram
         Libellé_court varchar(8) ""
         Toxicite_produit varchar(260) ""
     }
+
     amm_produits{
         amm int8 "PK"
         Nom_produit varchar(32)
@@ -82,6 +84,9 @@ erDiagram
         Numero_AMM_reference varchar(32) ""
         Nom_produit_reference varchar(32) ""
     }
+
+
+    
     Metadata_effectif_departement ||--|{ Effectif_cancer : "COD_MOD = Département"
     Metadata_effectif_departement ||--|{ Effectif_departement : "COD_MOD = Num_dep"
     Metadata_effectif_departement ||--|{ Effectif_departement  : "COD_MOD = Sexe"
