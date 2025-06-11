@@ -2,6 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
+from ../model/models import EffectifCancer
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -45,18 +46,27 @@ df_final = df_final.rename(columns={
 df_final["Effectif_patients"] = pd.to_numeric(df_final["Effectif_patients"], errors='coerce')
 df_final["Effectif_total"] = pd.to_numeric(df_final["Effectif_total"], errors='coerce')
 
+df_final = df_final.reset_index(drop=True)
+df_final.insert(0, 'id_effectif_cancer', df_final.index)
+
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
 
 with engine.connect() as conn:
     conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}";'))
     conn.execute(text(f'SET search_path TO {schema};'))
-    
+    SQLModel.metadata.create_all(conn)
+
+    try: 
+        conn.execute(text(f'TRUNCATE TABLE "{schema}".{table};'))
+    except Exception as e : 
+        print (f"Impossible de vider la table, erreur: {e}, insertion des données en cours...")
+
     df_final.to_sql(
         table,
         con=conn,
         schema=schema,
         index=False,
-        if_exists='replace',  
+        if_exists='append',  
         method='multi'
     )
 

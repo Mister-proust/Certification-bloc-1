@@ -49,7 +49,7 @@ erDiagram
         classification_mention varchar(20) ""
         code_cas varchar(20) ""
         code_substance varchar(20) ""
-        num_departement int(2) ""
+        num_departement int(2) "FK"
         fonction varchar(32) ""
         nom_substance varchar(64) ""
         département varchar(32) ""
@@ -57,14 +57,14 @@ erDiagram
 
     }
     amm_mention_danger{
+        id_amm_danger int8 "PK"
         amm int8 "FK"
         Nom_produit varchar(64) ""
         Libellé_court varchar(8) ""
         Toxicite_produit varchar(260) ""
-        id_amm_danger int8 "PK"
     }
     amm_produits{
-        amm int8 "PK, FK"
+        amm int8 "PK"
         Nom_produit varchar(32)
         Second_noms_commerciaux varchar(32) ""
         titulaire varchar(32) ""
@@ -87,5 +87,9 @@ erDiagram
     Metadata_effectif_departement ||--|{ Effectif_departement  : "COD_MOD = Sexe"
     Metadata_effectif_departement ||--|{ Effectif_departement  : "COD_MOD = Age"
     Metadata_effectif_departement ||--|{ Effectif_departement  : "COD_MOD = Carac_mesure"
-    title_basics ||--|{ title_episode : "tconst=parentTconst"
+    Metadata_effectif_departement ||--|{ Produits_vente : "COD_MOD = num_département"
+    Metadata_effectif_departement ||--|{ Substance_cmr_vente : "COD_MOD = num_departement"
+    amm_produits ||--|{ Produits_vente : "amm = amm"
+    amm_produits ||--|{ Substance_cmr_vente : "amm = amm"
+    amm_produits ||--|{ amm_mention_danger : "amm = amm"
 ```

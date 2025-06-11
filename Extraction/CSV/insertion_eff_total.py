@@ -51,6 +51,12 @@ df= df.rename(columns={
     "TIME_PERIOD": "Annee",
     "OBS_VALUE": "Effectif" })
 
+df = df.reset_index(drop=False)
+df = df.rename(columns={"index":"id_effectif_departement"})
+cols = df.columns.tolist()
+cols = ['id_effectif_departement'] + [col for col in cols if col != 'id_effectif_departement']
+df = df[cols]
+
 
 
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")

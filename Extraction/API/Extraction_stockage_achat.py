@@ -128,6 +128,9 @@ def clean_produits(df):
     colonnes_entiers = ["amm", "num_département"]
     for col in colonnes_entiers:
         df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    
+    df = df.reset_index(drop=True)
+    df.insert(0, 'id_produits_vente', df.index)
     print(f"Nettoyage terminé: {len(df)} lignes conservées")
 
     return df.reset_index(drop=True)
@@ -147,6 +150,9 @@ def clean_substances(df):
     colonnes_entiers = ["amm", "code_substance", "num_département"]
     for col in colonnes_entiers:
         df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    
+    df = df.reset_index(drop=True)
+    df.insert(0, 'id_substance', df.index)
     print(f"Nettoyage terminé: {len(df)} lignes conservées")
     return df.reset_index(drop=True)
 
@@ -183,11 +189,6 @@ def export_to_postgres(df, table_name: str, schema: str):
 def main():
     total_start_time = time.time()
     schema = "Pollution_Cancer"
-    print("USER =", DB_CONFIG['user'])
-    print("PASSWORD =", DB_CONFIG['password'])
-    print("HOST =", DB_CONFIG['host'])
-    print("PORT =", DB_CONFIG['port'])
-    print("DATABASE =", DB_CONFIG['database'])
 
 
     try:

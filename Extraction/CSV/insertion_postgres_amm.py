@@ -25,8 +25,6 @@ df_amm_danger = pd.read_csv("../../data/produits_classe_et_mention_danger_utf8.c
 
 df_amm_danger = df_amm_danger.drop(columns=["Unnamed: 4"])
 
-df_amm_danger["id_amm_danger"] = df_amm_danger.index
-
 df_amm_danger= df_amm_danger.rename(columns={
     "numero AMM": "amm",
     "nom produit" : "Nom_produit",
@@ -58,6 +56,11 @@ df_produits= df_produits.rename(columns={
     "Nom du produit de référence" : "Nom_produit_reference"
       })
 
+df_amm_danger = df_amm_danger.reset_index(drop=False)
+df_amm_danger = df_amm_danger.rename(columns={"index":"id_amm_danger"})
+cols = df_amm_danger.columns.tolist()
+cols = ['id_amm_danger'] + [col for col in cols if col != 'id_amm_danger']
+df_amm_danger = df_amm_danger[cols]
 
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
 

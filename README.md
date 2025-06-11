@@ -14,3 +14,4 @@ CSV : données démographiques : https://catalogue-donnees.insee.fr/fr/catalogue
 Données sur les pathologies : https://data.ameli.fr/explore/dataset/effectifs/table/
 
 Données sur l'AMM des substances et produits chimiques : https://www.data.gouv.fr/fr/datasets/donnees-ouvertes-du-catalogue-e-phy-des-produits-phytopharmaceutiques-matieres-fertilisantes-et-supports-de-culture-adjuvants-produits-mixtes-et-melanges/#/resources
+
