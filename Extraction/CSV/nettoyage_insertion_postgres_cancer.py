@@ -2,7 +2,8 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
-from ../model/models import EffectifCancer
+from model.models import EffectifCancer
+from sqlmodel import Session
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -48,6 +49,10 @@ df_final["Effectif_total"] = pd.to_numeric(df_final["Effectif_total"], errors='c
 
 df_final = df_final.reset_index(drop=True)
 df_final.insert(0, 'id_effectif_cancer', df_final.index)
+
+df_final["Sexe"] = df_final["Sexe"].replace({1: "M", 2: "F", 9: "_T"})
+df_final["Classe_age"] = df_final["Classe_age"].replace({"00-04": "Y_LT5", "05-09": "Y5T9", "10-14": "Y10T14", "15-19": "Y15T19", "20-24": "Y20T24", "25-29": "Y25T29", "30-34": "Y30T34", "95et+": "Y_GE95", "35-39": "Y35T39", "40-44": "Y40T44", "45-49": "Y45T49", "90-94": "Y90T94", "50-54": "Y50T54", "55-59": "Y55T59", "85-89": "Y85T89", "60-64": "Y60T64", "80-84": "Y80T84", "75-79": "Y75T79", "65-69": "Y65T69", "70-74": "Y70T74", "tsage": "_T" })
+
 
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
 

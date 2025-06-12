@@ -1,27 +1,16 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
-from dotenv import load_dotenv
-import os
+from sqlmodel import Session
+from model.db_init import engine
+from model.models import Ammmentiondanger, Ammproduits
+from datetime import datetime
 
-load_dotenv(dotenv_path="../../.env", override=True)
+def parse_date_safe(date_str):
+    try:
+        return pd.to_datetime(date_str, dayfirst=True).date()
+    except Exception:
+        return None
 
-USER = os.getenv("USER_POSTGRES")
-PASSWORD = os.getenv("PASSWORD_POSTGRES")
-HOST = os.getenv("HOST_POSTGRES")
-PORT = os.getenv("PORT_POSTGRES")
-DATABASE = os.getenv("DATABASE_POSTGRES")
-
-user = USER
-password = PASSWORD
-host = HOST
-port = PORT
-database = DATABASE
-schema = "Pollution_Cancer"
-table = "amm_mention_danger"
-table2 = "amm_produits"
-
-
-df_amm_danger = pd.read_csv("../../data/produits_classe_et_mention_danger_utf8.csv", sep=";")
+df_amm_danger = pd.read_csv("../data/produits_classe_et_mention_danger_utf8.csv", sep=";")
 
 df_amm_danger = df_amm_danger.drop(columns=["Unnamed: 4"])
 
@@ -32,7 +21,7 @@ df_amm_danger= df_amm_danger.rename(columns={
     "Libelle long": "Toxicite_produit"
       })
 
-df_produits = pd.read_csv("../../data/produits_utf8.csv", sep=";")
+df_produits = pd.read_csv("../data/produits_utf8.csv", sep=";")
 
 df_produits = df_produits.drop(columns=["type produit"])
 df_produits = df_produits.drop(columns=["Unnamed: 18"])
@@ -56,35 +45,29 @@ df_produits= df_produits.rename(columns={
     "Nom du produit de référence" : "Nom_produit_reference"
       })
 
+df_produits["Date_première_autorisation"] = df_produits["Date_première_autorisation"].apply(parse_date_safe)
+df_produits["Date_de_retrait"] = df_produits["Date_de_retrait"].apply(parse_date_safe)
+df_produits = df_produits.where(pd.notnull(df_produits), None)
+
 df_amm_danger = df_amm_danger.reset_index(drop=False)
 df_amm_danger = df_amm_danger.rename(columns={"index":"id_amm_danger"})
 cols = df_amm_danger.columns.tolist()
 cols = ['id_amm_danger'] + [col for col in cols if col != 'id_amm_danger']
 df_amm_danger = df_amm_danger[cols]
 
-engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
+liste_amm_danger = [
+    Ammmentiondanger(**row) for row in df_amm_danger.to_dict(orient="records")
+]
 
-with engine.connect() as conn:
-    conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}";'))
-    conn.execute(text(f'SET search_path TO {schema};'))
-    
-    df_amm_danger.to_sql(
-        table,
-        con=conn,
-        schema=schema,
-        index=False,
-        if_exists='replace',  
-        method='multi'
-    )
+liste_produits = [
+    Ammproduits(**row) for row in df_produits.to_dict(orient="records")
+]
 
-    df_produits.to_sql(
-        table2,
-        con=conn,
-        schema=schema,
-        index=False,
-        if_exists='replace',  
-        method='multi'
-    )
-    conn.commit()
+with Session(engine) as session:
+    session.add_all(liste_produits)
+    session.commit()
+    session.add_all(liste_amm_danger)
+    session.commit()
+
 
 print(f"Données insérées avec succès, veuillez vérifier.")

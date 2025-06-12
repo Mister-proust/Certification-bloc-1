@@ -5,3 +5,4 @@ SQLAlchemy
 tqdm
 psycopg2-binary
 python-dotenv
+sqlmodel
