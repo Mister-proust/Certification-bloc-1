@@ -1,21 +1,22 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel 
 from datetime import date
+from decimal import Decimal
 
 class EffectifCancer(SQLModel, table=True):
     __tablename__ = "Effectif_cancer"
 
     id_effectif_cancer: int = Field(default = None, primary_key=True)
 
-    Annee: int
-    Pathologie: str = Field(max_length = 64)
-    Type_cancer: str = Field(max_length = 128)
-    Suivi_patho: str = Field(max_length = 128)
-    Classe_age: str = Field(max_length = 12)
-    Sexe: int
-    Departement: str = Field(foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD", max_length = 4)
-    Effectif_patients: Optional[int] = Field(default=None)
-    Effectif_total: Optional[int] = Field(default=None)
+    Annee: int = Field(foreign_key="Pollution_Cancer.metadata_annee.code")
+    Pathologie: str = Field(max_length = 16)
+    Type_cancer: str = Field(max_length = 64)
+    Suivi_patho: str = Field(max_length = 64)
+    Classe_age: str = Field(max_length = 32, foreign_key="Pollution_Cancer.metadata_age.Code")
+    Sexe: str = Field(Max_length = 4, foreign_key="Pollution_Cancer.metadata_sexe.code")
+    Departement: str = Field(foreign_key="Pollution_Cancer.metadata_departement.code", max_length = 4)
+    Effectif_patients: Optional[Decimal] = Field(default=None, nullable=True)
+    Effectif_total: Optional[int] = Field(default=None, nullable=True)
 
 
     __table_args__ = {"schema": "Pollution_Cancer"}
@@ -28,14 +29,14 @@ class Effectifdepartement(SQLModel, table=True):
 
     id_effectif_departement : int = Field(default = None, primary_key=True)
 
-    Num_dep : str=Field(foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD", max_length = 4)
-    Carac_dep : str = Field(default= None, max_length = 8)
-    Sexe : str = Field(max_length = 2, foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD")
-    Age : str = Field(max_length = 8, foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD")
-    Carac_mesure : str = Field(default= None, max_length = 8, foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD")
-    Chiffre_def : str = Field(default= None, max_length = 2)
+    Num_dep : str=Field(foreign_key="Pollution_Cancer.metadata_departement.code", max_length = 12)
+    Carac_dep : Optional[str] = Field(default= None, max_length = 8, nullable=True)
+    Sexe : str = Field(max_length = 2, foreign_key="Pollution_Cancer.metadata_sexe.code")
+    Age : str = Field(max_length = 16, foreign_key="Pollution_Cancer.metadata_age.code")
+    Carac_mesure : Optional[str] = Field(default= None, max_length = 32, foreign_key="Pollution_Cancer.metadata_stats.code", nullable=True)
+    Chiffre_def : Optional[str] = Field(default= None, max_length = 16, foreign_key="Pollution_Cancer.metadata_obs_status.code", nullable=True)
     Annee : int = Field(default= None)
-    Effectif : int = Field(default= None)
+    Effectif : Optional[Decimal] = Field(default= None, nullable=True)
 
 
     __table_args__ = {"schema": "Pollution_Cancer"}
@@ -44,32 +45,16 @@ class Effectifdepartement(SQLModel, table=True):
         return f"Effectifdepartement(id={self.id_effectif_departement}, Num_dep={self.Num_dep}, Annee={self.Annee})"
 
 
-class Metadataeffectifdepartement(SQLModel, table=True):
-    __tablename__="Metadata_effectif_departement"
-
-    COD_VAR: str = Field(max_length = 12)
-    LIB_VAR: str = Field(max_length = 12)
-    COD_MOD : str = Field(max_length = 128, primary_key=True)
-    LIB_MOD: str = Field(max_length = 24)
-
-
-    __table_args__ = {"schema": "Pollution_Cancer"}
-
-    def __repr__(self):
-        return f"Metadataeffectifdepartement(COD_MOD={self.COD_MOD}, LIB_MOD={self.LIB_MOD})"
-
-
 class Produitsvente(SQLModel, table=True): 
     __tablename__="Produits_vente"
 
     id_produits_vente: int = Field(default = None, primary_key=True)
     amm: int = Field(foreign_key="Pollution_Cancer.amm_produits.amm")
-    annee: int = Field(default= None)
-    num_departement: str=Field(foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD", max_length = 4)
-    autorise_jardin : Optional[bool]=Field(default=None) 
-    département : str = Field(default= None, max_length = 64)
-    quantité_en_kg : int = Field(default=None)
-    unite: str = Field(default= None, max_length = 2)
+    annee: int = Field(default= None, foreign_key="Pollution_Cancer.metadata_annee.code")
+    num_departement: str=Field(foreign_key="Pollution_Cancer.metadata_departement.code", max_length = 4)
+    autorise_jardin : Optional[str]=Field(default=None, max_length=8, nullable=True) 
+    quantité_en_kg : Optional[Decimal] = Field(default=None, nullable=True)
+    unite: Optional[str] = Field(default= None, max_length = 2, nullable=True)
 
 
     __table_args__ = {"schema": "Pollution_Cancer"}
@@ -83,15 +68,14 @@ class Substancecmrvente(SQLModel, table=True):
 
     id_substance: int = Field(default = None, primary_key=True)
     amm: int = Field(foreign_key="Pollution_Cancer.amm_produits.amm")
-    annee : int = Field(default= None)
-    classification_mention: str=Field(default= None, max_length = 20)
-    code_cas: str=Field(default= None, max_length = 20)
-    code_substance: str=Field(default= None, max_length = 20)
-    num_departement: str=Field(foreign_key="Pollution_Cancer.Metadata_effectif_departement.COD_MOD", max_length = 4)
-    fonction: str=Field(default= None, max_length = 32)
-    nom_substance: str=Field(default= None, max_length = 64)
-    département: str=Field(default= None, max_length = 32)
-    quantite_en_kg: int = Field(default=None)
+    annee : int = Field(default= None, foreign_key="Pollution_Cancer.metadata_annee.code")
+    classification_mention: Optional[str]=Field(default= None, max_length = 20, nullable=True)
+    code_cas: Optional[str]=Field(default= None, max_length = 32, nullable=True)
+    code_substance: Optional[int]=Field(default= None, nullable=True)
+    num_departement: str=Field(foreign_key="Pollution_Cancer.metadata_departement.code", max_length = 4)
+    fonction: Optional[str]=Field(default= None, max_length = 128, nullable=True)
+    nom_substance: Optional[str]=Field(default= None, max_length = 256, nullable=True)
+    quantite_en_kg: Optional[Decimal] = Field(default=None, nullable=True)
 
 
     __table_args__ = {"schema": "Pollution_Cancer"}

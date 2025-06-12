@@ -116,16 +116,15 @@ def get_data(api_type: str, annee_min: int = 2013, annee_max: int = 2025):
 
 def clean_produits(df):
     print("Nettoyage des données du dataframe des produits...")
-    df = df[["amm", "annee", "code_territoire", "eaj", "libelle_territoire", "quantite", "unite"]]
+    df = df[["amm", "annee", "code_territoire", "eaj", "quantite", "unite"]]
     df = df[df["code_territoire"] != "0"]
     df = df.rename(columns={
         "code_territoire": "num_département",
-        "libelle_territoire": "département",
         "eaj": "autorise_jardin",
         "quantite": "quantite_en_kg"
     })
     
-    colonnes_entiers = ["amm", "num_département"]
+    colonnes_entiers = ["amm"]
     for col in colonnes_entiers:
         df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
     
@@ -139,15 +138,14 @@ def clean_substances(df):
     print("Nettoyage des données du dataframe des substances chimiques...")
     df = df[df["classification"].isin(["CMR", "T, T+, CMR"])]
     df = df[["amm", "annee", "classification_mention", "code_cas", "code_substance",
-             "code_territoire", "fonction", "libelle_substance", "libelle_territoire", "quantite"]]
+             "code_territoire", "fonction", "libelle_substance", "quantite"]]
     df = df[df["code_territoire"] != "0"]
     df = df.rename(columns={
         "code_territoire": "num_département",
-        "libelle_territoire": "département",
         "libelle_substance": "nom_substance",
         "quantite": "quantite_en_kg"
     })
-    colonnes_entiers = ["amm", "code_substance", "num_département"]
+    colonnes_entiers = ["amm", "code_substance"]
     for col in colonnes_entiers:
         df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
     
