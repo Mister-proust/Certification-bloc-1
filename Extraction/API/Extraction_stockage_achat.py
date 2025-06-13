@@ -121,7 +121,7 @@ def insert_sqlmodel_objects(df: pd.DataFrame, model_class, session: Session, bat
 
 def get_existing_amm(engine) -> set:
     with Session(engine) as session:
-        result = session.exec(text("SELECT amm FROM 'Pollution_Cancer'.'amm_produits'")).all()
+        result = session.exec(text('SELECT amm FROM "Pollution_Cancer".amm_produits')).all()
         return [row[0] for row in result]
     
 def main():
