@@ -1,6 +1,8 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, String
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
+from sqlmodel import Session
+from model.models import  MetadataAnnee
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -13,20 +15,11 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-metadata = MetaData(schema="Pollution_Cancer")
-
-metadata_annee = Table(
-    "metadata_annee", metadata,
-    Column("Code", String, primary_key=True),
-    Column("Libelle", String)
-)
-
-metadata.create_all(engine, checkfirst=True)
-
 # Ajout des lignes dans la table.
 def run(): 
-    with engine.begin() as conn: 
-        conn.execute(metadata_annee.insert().values([
+     with Session(engine) as session: 
+        session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+        data_to_insert= [
             {"Code": "1990", "Libelle": "1990"},
             {"Code": "1991", "Libelle": "1991"},
             {"Code": "1992", "Libelle": "1992"},
@@ -63,8 +56,12 @@ def run():
             {"Code": "2023", "Libelle": "2023"},
             {"Code": "2024", "Libelle": "2024"},
             {"Code": "2025", "Libelle": "2025"}
-        ]))
-        conn.commit()
+        ]
+        for item_data in data_to_insert:
+            metadata_annee = MetadataAnnee(**item_data)
+            session.add(metadata_annee)
+        
+        session.commit()
         print("metadata_annee inséré avec succès")
 
 

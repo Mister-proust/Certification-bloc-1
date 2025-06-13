@@ -6,9 +6,9 @@ from Metadata.metadata_annee import run as run_annee
 from Metadata.metadata_age import run as run_age
 
 if __name__ == "__main__":
-    run_obs_status()
-    run_stats()
-    run_sexe()
-    run_departement()
-    run_annee()
-    run_age()
+   run_obs_status()
+   run_stats()
+   run_sexe()
+   run_departement()
+   run_annee()
+   run_age()

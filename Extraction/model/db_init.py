@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlmodel import SQLModel
 
-from model.models import EffectifCancer, Effectifdepartement, Metadataeffectifdepartement, Produitsvente, Substancecmrvente, Ammmentiondanger, Ammproduits
+from model.models import EffectifCancer, EffectifDepartement, ProduitsVente, SubstanceCMRVente, AmmMentionDanger, AmmProduits, MetadataAge, MetadataSexe, MetadataDepartement, MetadataAnnee, MetadataObsStatus, MetadataStats
 
 
 load_dotenv(dotenv_path="../../.env", override=True)

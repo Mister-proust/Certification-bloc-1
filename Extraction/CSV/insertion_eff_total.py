@@ -2,6 +2,9 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
+from model.db_init import engine
+from model.models import  EffectifDepartement
+from sqlmodel import Session
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -19,7 +22,7 @@ database = DATABASE
 schema = "Pollution_Cancer"
 table = "Effectif_departement"
 
-df = pd.read_csv("../../data/eff_pop.csv", sep=";")
+df = pd.read_csv("../data/eff_pop.csv", sep=";")
 
 df = df[df["GEO_OBJECT"] == "DEP"]
 
@@ -39,20 +42,23 @@ cols = df.columns.tolist()
 cols = ['id_effectif_departement'] + [col for col in cols if col != 'id_effectif_departement']
 df = df[cols]
 
+def retirer_zero(code_str):
+    if isinstance(code_str, str) and code_str.isdigit():
+        return str(int(code_str)) 
+    return code_str
+
+df["Num_dep"] = df["Num_dep"].apply(retirer_zero)
+
+
 engine = create_engine(f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}")
 
-with engine.connect() as conn:
-    conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}";'))
-    conn.execute(text(f'SET search_path TO {schema};'))
-    
-    df.to_sql(
-        table,
-        con=conn,
-        schema=schema,
-        index=False,
-        if_exists='replace',  
-        method='multi'
-    )
-    conn.commit()
+liste_Effectif = [
+    EffectifDepartement(**row) for row in df.to_dict(orient="records")
+]
+
+
+with Session(engine) as session:
+    session.add_all(liste_Effectif)
+    session.commit()
 
 print(f"Données insérées avec succès, veuillez vérifier.")

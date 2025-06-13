@@ -1,6 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, String, Integer
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
+from model.models import  MetadataAge 
+from sqlmodel import Session
+
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -13,21 +16,11 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-metadata = MetaData(schema="Pollution_Cancer")
-
-metadata_age = Table(
-    "metadata_age", metadata,
-    Column("Code", String, primary_key=True),
-    Column("Libelle", String),
-    Column("Age_median", Integer) 
-)
-
-metadata.create_all(engine, checkfirst=True)
-
 # Ajout des lignes dans la table. 
 def run(): 
-    with engine.begin() as conn: 
-        conn.execute(metadata_age.insert().values([
+    with Session(engine) as session: 
+        session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+        data_to_insert= [
             {"Code": "Y_LT20", "Libelle": "0 à 19 ans", "Age_median": "10"},
             {"Code": "Y20T39", "Libelle": "De 20 à 39 ans","Age_median": "30"},
             {"Code": "Y40T59", "Libelle": "De 40 à 59 ans", "Age_median" : "50"},
@@ -55,9 +48,14 @@ def run():
             {"Code": "Y55T59", "Libelle": "De 55 à 59 ans", "Age_median" : "57"},
             {"Code": "_Z", "Libelle": "Non applicable", "Age_median" : None},
             {"Code": "_T", "Libelle": "Total", "Age_median" : None}
+        ]
+        
+        for item_data in data_to_insert:
+            metadata_age = MetadataAge(**item_data)
+            session.add(metadata_age)
+        
+        session.commit()
 
-        ]))
-        conn.commit()
         print("metadata_age inséré avec succès")
 
 

@@ -1,6 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, String
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import os
+from model.models import  MetadataDepartement
+from sqlmodel import Session
+
 
 load_dotenv(dotenv_path="../../.env", override=True)
 
@@ -13,20 +16,11 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-metadata = MetaData(schema="Pollution_Cancer")
-
-metadata_departement = Table(
-    "metadata_departement", metadata,
-    Column("Code", String, primary_key=True),
-    Column("Libelle", String)
-)
-
-metadata.create_all(engine, checkfirst=True)
-
 # Ajout des lignes dans la table. 
 def run(): 
-    with engine.begin() as conn:
-        conn.execute(metadata_departement.insert().values([
+    with Session(engine) as session: 
+        session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+        data_to_insert= [
             {"Code": "1", "Libelle": "Ain"},
             {"Code": "2", "Libelle": "Aisne"},
             {"Code": "3", "Libelle": "Allier"},
@@ -128,10 +122,20 @@ def run():
             {"Code": "972", "Libelle": "Martinique"},
             {"Code": "973", "Libelle": "Guyane"},
             {"Code": "974", "Libelle": "La Réunion"},
+            {"Code": "975", "Libelle": "Mayotte"},
+            {"Code": "976", "Libelle": "Wallis et Futuna"},
+            {"Code": "987", "Libelle": "Polynésie Française"},
+            {"Code": "988", "Libelle": "Nouvelle Calédonie"},
+            {"Code": "999", "Libelle": "Total"},
             {"Code": "DOM", "Libelle": "Départements d'Outre-mer"},
             {"Code": "F", "Libelle": "France"}
-        ]))
-        conn.commit()
+        ]
+        
+        for item_data in data_to_insert:
+            metadata_departement = MetadataDepartement(**item_data)
+            session.add(metadata_departement)
+        
+        session.commit()
         print("metadata_departement inséré avec succès")
 
 

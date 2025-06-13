@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlmodel import Session
 from model.db_init import engine
-from model.models import Ammmentiondanger, Ammproduits
+from model.models import AmmMentionDanger, AmmProduits
 from datetime import datetime
 
 def parse_date_safe(date_str):
@@ -49,6 +49,11 @@ df_produits["Date_première_autorisation"] = df_produits["Date_première_autoris
 df_produits["Date_de_retrait"] = df_produits["Date_de_retrait"].apply(parse_date_safe)
 df_produits = df_produits.where(pd.notnull(df_produits), None)
 
+df_produits['amm'] = pd.to_numeric(df_produits['amm'], errors='coerce')  
+df_produits = df_produits.dropna(subset=['amm'])                         
+df_produits['amm'] = df_produits['amm'].astype(int)          
+
+
 df_amm_danger = df_amm_danger.reset_index(drop=False)
 df_amm_danger = df_amm_danger.rename(columns={"index":"id_amm_danger"})
 cols = df_amm_danger.columns.tolist()
@@ -56,11 +61,11 @@ cols = ['id_amm_danger'] + [col for col in cols if col != 'id_amm_danger']
 df_amm_danger = df_amm_danger[cols]
 
 liste_amm_danger = [
-    Ammmentiondanger(**row) for row in df_amm_danger.to_dict(orient="records")
+    AmmMentionDanger(**row) for row in df_amm_danger.to_dict(orient="records")
 ]
 
 liste_produits = [
-    Ammproduits(**row) for row in df_produits.to_dict(orient="records")
+    AmmProduits(**row) for row in df_produits.to_dict(orient="records")
 ]
 
 with Session(engine) as session:

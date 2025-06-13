@@ -6,3 +6,6 @@ tqdm
 psycopg2-binary
 python-dotenv
 sqlmodel
+fastapi[standard]
+python-jose
+passlib
