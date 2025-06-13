@@ -5,7 +5,7 @@ from model.models import  MetadataSexe
 from sqlmodel import Session
 
 
-load_dotenv(dotenv_path="../../.env", override=True)
+load_dotenv(dotenv_path="../.env", override=True)
 
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")

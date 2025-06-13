@@ -4,7 +4,7 @@ import os
 from sqlmodel import Session
 from model.models import  MetadataAnnee
 
-load_dotenv(dotenv_path="../../.env", override=True)
+load_dotenv(dotenv_path="../.env", override=True)
 
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
