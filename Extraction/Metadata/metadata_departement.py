@@ -127,6 +127,7 @@ def run():
             {"Code": "987", "Libelle": "Polynésie Française"},
             {"Code": "988", "Libelle": "Nouvelle Calédonie"},
             {"Code": "999", "Libelle": "Total"},
+            {"Code": "(0)", "Libelle": "Total"},
             {"Code": "DOM", "Libelle": "Départements d'Outre-mer"},
             {"Code": "F", "Libelle": "France"}
         ]
