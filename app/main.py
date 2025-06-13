@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from services.authentification import get_db, authenticate_user, create_access_token, get_current_user
 from datetime import timedelta
+from Database.crud import test_fonction_sql
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="./static"), name="static")
@@ -30,3 +31,8 @@ async def login_for_access_token(
     response = RedirectResponse(url="/afterlogin", status_code=303)
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
+
+
+@app.get("/produits/")
+def read_produits():
+    return test_fonction_sql()

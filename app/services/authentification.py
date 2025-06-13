@@ -17,8 +17,7 @@ DB_PORT = os.getenv("PORT_POSTGRES", 5432)
 DB_USER = os.getenv("USER_POSTGRES")
 DB_PASS = os.getenv("PASSWORD_POSTGRES")
 DB_NAME = os.getenv("DATABASE_POSTGRES")
-
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
