@@ -5,7 +5,7 @@ import os
 from model.models import EffectifCancer
 from sqlmodel import Session, create_engine
 
-load_dotenv(dotenv_path="../../.env", override=True)
+load_dotenv(dotenv_path="../.env", override=True)
 
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")

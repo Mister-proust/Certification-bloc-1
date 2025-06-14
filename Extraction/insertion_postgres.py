@@ -4,6 +4,9 @@ from Metadata.metadata_sexe import run as run_sexe
 from Metadata.metadata_departement import run as run_departement
 from Metadata.metadata_annee import run as run_annee
 from Metadata.metadata_age import run as run_age
+import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
 if __name__ == "__main__":
    run_obs_status()

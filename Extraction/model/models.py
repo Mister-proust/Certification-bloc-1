@@ -121,7 +121,7 @@ class ProduitsVente(SQLModel, table=True):
     annee: int = Field(default= None, foreign_key="Pollution_Cancer.metadata_annee.Code")
     num_departement: str=Field(foreign_key="Pollution_Cancer.metadata_departement.Code", max_length = 4)
     autorise_jardin : Optional[str]=Field(default=None, max_length=8, nullable=True) 
-    quantité_en_kg : Optional[Decimal] = Field(default=None, nullable=True)
+    quantite_en_kg : Optional[Decimal] = Field(default=None, nullable=True)
     unite: Optional[str] = Field(default= None, max_length = 2, nullable=True)
 
 

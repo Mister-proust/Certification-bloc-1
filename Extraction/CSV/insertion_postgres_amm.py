@@ -18,7 +18,7 @@ df_amm_danger= df_amm_danger.rename(columns={
     "numero AMM": "amm",
     "nom produit" : "Nom_produit",
     "Libellé court": "Libellé_court",
-    "Libelle long": "Toxicite_produit"
+    "Libellé long": "Toxicite_produit"
       })
 
 df_produits = pd.read_csv("../data/produits_utf8.csv", sep=";")
@@ -38,7 +38,7 @@ df_produits= df_produits.rename(columns={
     "Substances actives" : "Substances_actives",
     "fonctions" : "Fonctions",
     "formulations" : "Formulations",
-    "Etat d'autorisation" : "Etat_d_autorisation",
+    "Etat d’autorisation" : "Etat_d_autorisation",
     "Date de retrait du produit" : "Date_de_retrait",
     "Date de première autorisation" : "Date_première_autorisation",
     "Numéro AMM du produit de référence" : "Numero_AMM_reference",

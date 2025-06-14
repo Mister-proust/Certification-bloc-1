@@ -9,7 +9,7 @@ from sqlmodel import SQLModel, Session, create_engine
 from sqlalchemy import text
 
 # Chargement des variables d'environnement
-load_dotenv(dotenv_path="../../.env", override=True)
+load_dotenv(dotenv_path="../.env", override=True)
 
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
@@ -82,7 +82,8 @@ def retirer_zero(code_str):
 def clean_produits(df):
     print("Nettoyage des produits...")
     df = df[["amm", "annee", "code_territoire", "eaj", "quantite", "unite"]]
-    df = df[df["code_territoire"] != "0"]
+    df["code_territoire"] = df["code_territoire"].astype(str)
+    df = df[df["code_territoire"] != "00"]
     df = df.rename(columns={
         "code_territoire": "num_departement",
         "eaj": "autorise_jardin",
@@ -99,7 +100,8 @@ def clean_substances(df):
     df = df[df["classification"].isin(["CMR", "T, T+, CMR"])]
     df = df[["amm", "annee", "classification_mention", "code_cas", "code_substance",
              "code_territoire", "fonction", "libelle_substance", "quantite"]]
-    df = df[df["code_territoire"] != "0"]
+    df["code_territoire"] = df["code_territoire"].astype(str)
+    df = df[df["code_territoire"] != "00"]
     df = df.rename(columns={
         "code_territoire": "num_departement",
         "libelle_substance": "nom_substance",

@@ -6,7 +6,7 @@ from sqlmodel import SQLModel
 from model.models import EffectifCancer, EffectifDepartement, ProduitsVente, SubstanceCMRVente, AmmMentionDanger, AmmProduits, MetadataAge, MetadataSexe, MetadataDepartement, MetadataAnnee, MetadataObsStatus, MetadataStats
 
 
-load_dotenv(dotenv_path="../../.env", override=True)
+load_dotenv(dotenv_path="../.env", override=True)
 
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
