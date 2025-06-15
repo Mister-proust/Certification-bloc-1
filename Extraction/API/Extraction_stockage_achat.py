@@ -126,7 +126,7 @@ def get_existing_amm(engine) -> set:
         result = session.exec(text('SELECT amm FROM "Pollution_Cancer".amm_produits')).all()
         return [row[0] for row in result]
     
-def main():
+def run():
     SQLModel.metadata.create_all(engine)
 
     try:
@@ -151,11 +151,11 @@ def main():
             insert_sqlmodel_objects(df_produits_clean, ProduitsVente, session)
             insert_sqlmodel_objects(df_substances_clean, SubstanceCMRVente, session)
 
-        print("Données insérées avec succès.")
+        print("Données achat substances et produits chimiques insérées avec succès.")
 
     except Exception as e: 
         print(f"Problème dans le script : {e}")
         raise
 
 if __name__ == "__main__":
-    main()
+    run()
