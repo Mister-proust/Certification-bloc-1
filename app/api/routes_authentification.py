@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Form
+from fastapi import APIRouter, Depends, HTTPException, Request, Form, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -65,3 +65,9 @@ async def register_user(
         "login.html", 
         {"request": request, "nom_app": "Pesticancer", "message": "Inscription réussie ! Vous pouvez maintenant vous connecter."}
     )
+
+@router.get("/deconnexion")
+async def logout():
+    response = RedirectResponse(url="/", status_code=302)
+    response.delete_cookie("access_token")
+    return response

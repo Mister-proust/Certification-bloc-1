@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Carte des départements</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+    <style>
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+  <a href="/carte_france">Généralités</a>
+  <a class="active" href="/carte_age">âge</a>
+  <a href="/carte_sexe">sexe</a>
+  <a href="/substance">Information sur les substances</a>
+  <a href="/deconnexion">Déconnexion</a>
+</div>
+    <h4>Carte Française des départements</h4>
+    <h5> Veuillez cliquez sur le département que vous souhaitez analyser.</h5>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([46.5, 2.5], 5); 
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        fetch("/static/carte_departement/departements-avec-outre-mer.geojson")
+            .then(response => response.json())
+            .then(geojson => {
+                L.geoJSON(geojson, {
+                    onEachFeature: function (feature, layer) {
+                        const code = feature.properties.code;
+                        const nom = feature.properties.nom;
+                        layer.bindPopup(`${nom} (${code})`);
+                        layer.on('click', () => {
+                            window.location.href = `/carte_france/${code}`;
+                        });
+                    },
+                    style: {
+                        color: "#3388ff",
+                        weight: 1,
+                        fillOpacity: 0.3
+                    }
+                }).addTo(map);
+            });
+    </script>
+</body>
+</html>

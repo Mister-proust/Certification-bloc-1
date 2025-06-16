@@ -52,17 +52,28 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const hasError = Number("{{ error | default(0) }}");
-        if (hasError) {
-            const toastEl = document.getElementById('error-toast');
-            const toastBody = document.getElementById('error-toast-body');
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const errorCode = Number("{{ error | default(0) }}");
+    if (errorCode) {
+        const toastEl = document.getElementById('error-toast');
+        const toastBody = document.getElementById('error-toast-body');
+
+        if (errorCode === 1) {
             toastBody.textContent = "Email ou mot de passe incorrect, veuillez réessayer.";
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
+        } else if (errorCode === 2) {
+            toastBody.textContent = "Vous devez être connecté pour accéder à cette page.";
+        } else {
+            toastBody.textContent = "Erreur inconnue.";
         }
-    });</script>
+
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+});
+</script>
+
+
 </body>
 
 </html>
