@@ -66,3 +66,82 @@ body {
 .toast-container {
     z-index: 1055;
 }
+
+.topnav {
+  background-color: #e8f5e9; 
+  overflow: hidden;
+  border-bottom: 1px solid #c8e6c9;
+}
+
+.topnav a {
+  float: left;
+  color: #2e7d32; 
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.topnav a:hover {
+  background-color: #c8e6c9; 
+  color: #1b5e20;
+  border-radius: 4px;
+}
+
+.topnav a.active {
+  background-color: #2e7d32;
+  color: white;
+  border-radius: 4px;
+}
+
+.accueil-section {
+  padding: 60px 30px;
+  background: linear-gradient(to bottom right, #e8f5e9, #ffffff);
+  margin-top: 60px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(46, 125, 50, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.titre-accueil {
+  font-size: 2rem;
+  color: #2e7d32;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.sous-titre {
+  font-size: 1.1rem;
+  color: #4f4f4f;
+  max-width: 700px;
+  margin: 0 auto 2rem auto;
+}
+
+.btn-custom {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+    margin-right: 10px;
+    width: auto;
+}
+
+.btn-register {
+    background-color: transparent;
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+}
+
+body {
+    background-color: #f4f7f5;
+    background-image: url("data:image/svg+xml,%3Csvg opacity='0.05' width='20' height='20' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle fill='%23339966' cx='50' cy='50' r='2'/%3E%3C/svg%3E");
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.85rem;
+}

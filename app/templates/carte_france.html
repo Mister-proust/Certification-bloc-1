@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Carte des départements</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
     <style>
         #map {
             height: 90vh;
@@ -12,6 +13,13 @@
     </style>
 </head>
 <body>
+    <div class="topnav">
+  <a class="active" href="/carte_france">Généralités</a>
+  <a href="/carte_age">âge</a>
+  <a href="/carte_sexe">sexe</a>
+  <a href="/substance">Information sur les substances</a>
+  <a href="/deconnexion">Déconnexion</a>
+</div>
     <h4>Carte Française des départements</h4>
     <h5> Veuillez cliquez sur le département que vous souhaitez analyser.</h5>
     <div id="map"></div>

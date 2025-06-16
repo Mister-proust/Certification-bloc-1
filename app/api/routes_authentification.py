@@ -29,7 +29,7 @@ async def login_for_access_token(
         data={"sub": user.email},
         expires_delta=timedelta(minutes=30)
     )
-    response = RedirectResponse(url="/afterlogin", status_code=303)
+    response = RedirectResponse(url="/carte_france", status_code=303)
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
 

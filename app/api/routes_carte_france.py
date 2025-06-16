@@ -16,4 +16,4 @@ async def read_map(request: Request, user=Depends(get_current_user)):
 
 @router.get("/carte_france/{dept_code}", response_class=HTMLResponse)
 async def show_department(request: Request, dept_code: str, user=Depends(get_current_user)):
-    return HTMLResponse(content=f"<h4>Données pour le département {dept_code} (utilisateur : {user.email})</h4>")
+    return HTMLResponse(content=f"<h4>Données pour le département {dept_code} </h4>")

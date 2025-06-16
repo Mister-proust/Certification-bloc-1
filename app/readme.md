@@ -1,0 +1,1 @@
+Pour lancer l'application, veuillez écrire dans le terminal la commande suivante dans le dossier app : uvicorn main:app --reload 
