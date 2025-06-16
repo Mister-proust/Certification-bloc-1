@@ -6,10 +6,29 @@ import re
 import os
 from urllib.parse import urljoin, quote
 import logging
+from datetime import datetime
 
-# Configuration du logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+
+def setup_logging():
+    os.makedirs("../logs", exist_ok=True)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f"../logs/scraper_{timestamp}.log"
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filename, encoding='utf-8'),
+            logging.StreamHandler()
+        ]
+    )
+    
+    logger = logging.getLogger(__name__)
+    logger.info(f"Script lancé, début du scrapping - {datetime.now()} ===")
+    logger.info(f"Les logs sont sauvegardés dans : {log_filename}")
+    
+    return logger
 
 class SagePesticidesScraper:
     def __init__(self):
@@ -21,15 +40,17 @@ class SagePesticidesScraper:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         })
 
+        self.logger = logging.getLogger(__name__)
+
     def get_substances_actives(self):
-        logger.info("Récupération des substances actives...")
+        self.logger.info("Récupération des substances actives...")
         try:
             response = self.session.get(self.search_url)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
             select = soup.find('select', {'id': 'MatiereActiveId'})
             if not select:
-                logger.error("Élément <select> introuvable.")
+                self.logger.error("Élément <select> introuvable.")
                 return []
 
             substances = [
@@ -37,10 +58,10 @@ class SagePesticidesScraper:
                 for option in select.find_all('option')
                 if option.get('value')
             ]
-            logger.info(f"{len(substances)} substances actives trouvées.")
+            self.logger.info(f"{len(substances)} substances actives trouvées.")
             return substances
         except requests.RequestException as e:
-            logger.error(f"Erreur lors de la récupération : {e}")
+            self.logger.error(f"Erreur lors de la récupération : {e}")
             return []
 
     def extract_table_data(self, table):
@@ -96,7 +117,7 @@ class SagePesticidesScraper:
         return infos
 
     def get_substance_details(self, substance_id, substance_name):
-        logger.info(f"Récupération des données textuelles de : {substance_name}")
+        self.logger.info(f"Récupération des données textuelles de : {substance_name}")
         try:
             url = f"{self.base_url}/Recherche/RechercheMatiere/DisplayMatiere?MatiereActiveID={substance_id}&searchText={quote(substance_name)}&isProduct=False"
             response = self.session.get(url)
@@ -116,13 +137,14 @@ class SagePesticidesScraper:
                     if self.extract_table_data(table)
                 ]
             }
+            self.logger.info(f"Données de {substance_name} bien récupérées.")
             return data
         except requests.RequestException as e:
-            logger.error(f"Erreur pour {substance_name} : {e}")
+            self.logger.error(f"Erreur de récupération des données pour {substance_name} : {e}")
             return None
 
     def scrape_all(self, max_substances=None, delay=1):
-        logger.info("Début du scraping complet...")
+        self.logger.info("Début du scraping complet...")
         substances = self.get_substances_actives()
         if not substances:
             return []
@@ -132,12 +154,14 @@ class SagePesticidesScraper:
 
         results = []
         for i, substance in enumerate(substances):
-            logger.info(f"{i+1}/{len(substances)} - {substance['nom']}")
+            self.logger.info(f"{i+1}/{len(substances)} - {substance['nom']}")
             data = self.get_substance_details(substance['id'], substance['nom'])
             if data:
                 results.append(data)
             if delay and i < len(substances) - 1:
                 time.sleep(delay)
+        
+        self.logger.info(f" Scrapping terminé, {len(results)} substances récupérées.")
         return results
 
     def save_to_json(self, data, filename="infos_substances.json"):
@@ -146,16 +170,30 @@ class SagePesticidesScraper:
             filepath = os.path.join("../data", filename)
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-            logger.info(f"Données sauvegardées dans {filepath}")
+            self.logger.info(f"Données sauvegardées dans {filepath}")
         except Exception as e:
-            logger.error(f"Erreur de sauvegarde : {e}")
+            self.logger.error(f"Erreur de sauvegarde : {e}")
 
 def main():
-    scraper = SagePesticidesScraper()
-    data = scraper.scrape_all(delay=2)
-    if data:
-        scraper.save_to_json(data)
-    print("Tout est terminé, veuillez consulter le fichier dans /data.")
+    logger = setup_logging()
+    try:
+        scraper = SagePesticidesScraper()
+        data = scraper.scrape_all(delay=2)
+        
+        if data:
+            scraper.save_to_json(data)
+            logger.info("Scraping terminé avec succès")
+        else:
+            logger.error("Aucune donnée récupérée")
+            
+    except Exception as e:
+        logger.error(f"Erreur critique : {e}")
+        raise
+    finally:
+        logger.info(f"Scrapping terminé. - {datetime.now()} ===")
+        
+    print("Tout est terminé, veuillez consulter le fichier dans /data et les logs dans /logs.")
+
 
 if __name__ == "__main__":
     main()
