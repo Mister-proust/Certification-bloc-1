@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, create_engine
+from sqlalchemy import Column, Integer, String, Boolean, create_engine, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from passlib.context import CryptContext
@@ -31,10 +31,12 @@ Base = declarative_base()
 class Utilisateurs(Base):
     __tablename__ = "Utilisateurs"
     __table_args__ = {"schema": "Authentification"}
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
+    
+    email = Column(String, unique=True,primary_key=True, index=True)
     hashed_password = Column(String)
+    nom = Column(String, nullable=False)
+    prenom = Column(String, nullable=False)
+    date_naissance = Column(Date, nullable=False)
     is_active = Column(Boolean, default=True)
 
 def create_tables():
