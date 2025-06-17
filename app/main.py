@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from fastapi.requests import Request
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import RedirectResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import sys
@@ -9,6 +9,9 @@ from api.routes_authentification import router as authentification_router
 from api.route_accueil import router as accueil_router
 from api.route_substance import router as substance_router
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import RedirectResponse
+from starlette.requests import Request
+from starlette.status import HTTP_401_UNAUTHORIZED
 from services.templates import templates 
 
 app = FastAPI(
@@ -28,7 +31,11 @@ app.include_router(substance_router)
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+    if exc.status_code == HTTP_401_UNAUTHORIZED:
         return RedirectResponse(url="/login?error=2", status_code=302)
+    raise 
 
-    return await app.default_exception_handler(exc)
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/favicon.ico")
