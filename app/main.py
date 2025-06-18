@@ -14,6 +14,7 @@ from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 from services.templates import templates 
 
+
 app = FastAPI(
     title="API cancer et pesticides",
     description="Exposition des données de ventes des pesticides et des personnes atteintes de cancer par département en France",

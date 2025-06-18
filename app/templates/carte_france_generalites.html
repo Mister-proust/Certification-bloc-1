@@ -1,0 +1,39 @@
+{% block content %}
+<h2>Données pour le département {{ dept_code }}</h2>
+
+{% if data %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Année</th>
+                <th>Type cancer</th>
+                <th>Total patients</th>
+                <th>Population</th>
+                <th>Prévalence (%)</th>
+                <th>Substances (kg)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    <td>{{ row.annee }}</td>
+                    <td>{{ row.type_cancer }}</td>
+                    <td>{{ row.effectif_patients | round(0) }}</td>
+                    <td>{{ row.effectif_total | round(0) }}</td>
+                    <td>
+                        {% if row.prevalence_pourcentage is defined and row.prevalence_pourcentage is not none %}
+                            {{ row.prevalence_pourcentage | round(2) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ row.quantite_en_kg | round(2) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Aucune donnée disponible pour ce département.</p>
+{% endif %}
+
+{% endblock %}
