@@ -36,8 +36,8 @@ LEFT JOIN
 WHERE
     ec."Annee" BETWEEN 2015 AND 2022
     AND ec."Classe_age" LIKE '\_T' ESCAPE '\'
-    AND ec."Sexe" LIKE '\_T' ESCAPE '\'
-    AND ec."Departement" = %(dept_code)s
+    AND ec."Sexe" IN ('M','F')
+    AND ec."Departement" = %(dept_code)s 
 GROUP BY
     ec."Annee",
     ec."Departement", 
@@ -50,4 +50,5 @@ GROUP BY
 ORDER BY
     md."Libelle" ASC,
     ec."Annee" ASC;
+
 
