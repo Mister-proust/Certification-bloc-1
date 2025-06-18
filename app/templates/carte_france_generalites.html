@@ -1,39 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Données des départements généralités</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+    <style>
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<div class="topnav">
+  <a class="active" href="/carte_france">Généralités</a>
+  <a href="/carte_age">âge</a>
+  <a href="/carte_sexe">sexe</a>
+  <a href="/substance">Information sur les substances</a>
+  <a href="/deconnexion">Déconnexion</a>
+</div>
 {% block content %}
-<h2>Données pour le département {{ dept_code }}</h2>
+<div class="card mt-4">
+    <div class="card-header">
+        Données pour le département {{ dept_code }} : {{ nom_departement }}
+    </div>
+    <div class="card-body">
+        <form method="get" class="mb-4">
+            <input type="hidden" name="dept_code" value="{{ dept_code }}">
 
-{% if data %}
-    <table border="1">
-        <thead>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" for="annee">Année :</label>
+                    <select class="form-control" name="annee" id="annee">
+                        <option value="">Toutes</option>
+                        {% for y in range(2015, 2023) %}
+                            <option value="{{ y }}" {% if annee == y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" for="type_cancer">Type de cancer :</label>
+                    <select class="form-control" name="type_cancer" id="type_cancer">
+                        <option value="">Tous</option>
+                        {% set types = ['Autres cancers', 'Cancer bronchopulmonaire', 'Cancer colorectal', 'Cancer de la prostate', 'Cancer du sein de la femme'] %}
+                        {% for c in types %}
+                            <option value="{{ c }}" {% if type_cancer == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-custom">Filtrer</button>
+        </form>
+
+        {% if (annee or type_cancer) and data %}
+        <div style="overflow-x: auto; margin-top: 1rem;">
+    <table style="
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: center;
+    ">
+        <thead style="background-color: #e8f5e9; color: #2e7d32;">
             <tr>
-                <th>Année</th>
-                <th>Type cancer</th>
-                <th>Total patients</th>
-                <th>Population</th>
-                <th>Prévalence (%)</th>
-                <th>Substances (kg)</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Année</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Type cancer</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Patients</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Population</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Prévalence (%)</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Substances chimiques achetées (kg)</th>
             </tr>
         </thead>
         <tbody>
             {% for row in data %}
-                <tr>
-                    <td>{{ row.annee }}</td>
-                    <td>{{ row.type_cancer }}</td>
-                    <td>{{ row.effectif_patients | round(0) }}</td>
-                    <td>{{ row.effectif_total | round(0) }}</td>
-                    <td>
-                        {% if row.prevalence_pourcentage is defined and row.prevalence_pourcentage is not none %}
-                            {{ row.prevalence_pourcentage | round(2) }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>{{ row.quantite_en_kg | round(2) }}</td>
-                </tr>
+            <tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding: 0.6rem;">{{ row.annee }}</td>
+                <td style="padding: 0.6rem;">{{ row.type_cancer }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_patients | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_total | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">
+                    {% if row.prevalence_pourcentage is defined and row.prevalence_pourcentage is not none %}
+                        {{ row.prevalence_pourcentage | round(2) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.quantite_en_kg | round(2) }}</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-{% else %}
-    <p>Aucune donnée disponible pour ce département.</p>
-{% endif %}
+</div>
 
+        {% elif (annee or type_cancer) and not data %}
+            <p style="margin-top: 1rem; color: #c62828;">Aucune donnée disponible pour ce filtre.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from Database.db import connection_postgres
+from typing import Optional
 
 
 def lecture_fichier_sql(filename: str) -> str:
@@ -15,8 +16,19 @@ def test_fonction_sql():
     return [{"id": r[0], "nom": r[1], "titulaire": r[2]} for r in rows]
 
 
-def generalite_data(dept_code: str):
+def generalite_data(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[str] = None):
     sql = lecture_fichier_sql("Database/sql/generalite_sql.sql")
+    # Ajouter dynamiquement les filtres
+    filtres = []
+    filtres.append(f"ec.\"Departement\" = '{dept_code}'")
+    if annee:
+        filtres.append(f"ec.\"Annee\" = {annee}")
+    if type_cancer:
+        filtres.append(f"ec.\"Type_cancer\" = '{type_cancer}'")
+
+    # Trouver l'endroit où injecter les filtres
+    sql_parts = sql.split("WHERE")
+    sql = sql_parts[0] + "WHERE " + " AND ".join(filtres) + " AND " + sql_parts[1]
     conn = connection_postgres()
     cursor = conn.cursor()
     cursor.execute(sql, {"dept_code": dept_code})

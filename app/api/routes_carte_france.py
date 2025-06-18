@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import HTMLResponse
+from typing import Optional
 from Database.crud import test_fonction_sql, generalite_data
 from services.authentification import get_current_user
 from services.templates import templates
@@ -15,14 +16,18 @@ async def read_map(request: Request, user=Depends(get_current_user)):
     return templates.TemplateResponse("carte_france.html", {"request": request, "user": user})
 
 @router.get("/carte_france/{dept_code}", response_class=HTMLResponse)
-async def departement (request: Request, dept_code: str, user=Depends(get_current_user)):
-    data = generalite_data(dept_code)  
+async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user)):
+    data = generalite_data(dept_code, annee, type_cancer)  
+    nom_departement = data[0]["nom_departement"] if data else "Inconnu"
 
     return templates.TemplateResponse("carte_france_generalites.html", {
         "request": request,
         "user": user,
         "dept_code": dept_code,
-        "data": data
+        "data": data,
+        "annee": annee,
+        "type_cancer": type_cancer,
+        "nom_departement": nom_departement
     })
 
 @router.get("/carte_age", response_class=HTMLResponse)
