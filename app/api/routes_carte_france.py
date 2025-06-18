@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import HTMLResponse
 from typing import Optional
-from Database.crud import test_fonction_sql, generalite_data
+from Database.crud import test_fonction_sql, generalite_data, graphiques_generalites, convert_decimal
 from services.authentification import get_current_user
 from services.templates import templates
 
@@ -19,6 +19,8 @@ async def read_map(request: Request, user=Depends(get_current_user)):
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user)):
     data = generalite_data(dept_code, annee, type_cancer)  
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
+    graph_data = graphiques_generalites(data)
+    graph_data_converti = convert_decimal(graph_data)
 
     return templates.TemplateResponse("carte_france_generalites.html", {
         "request": request,
@@ -27,7 +29,8 @@ async def departement (request: Request, dept_code: str, annee: Optional[str] = 
         "data": data,
         "annee": annee,
         "type_cancer": type_cancer,
-        "nom_departement": nom_departement
+        "nom_departement": nom_departement,
+        "graph_data": graph_data_converti
     })
 
 @router.get("/carte_age", response_class=HTMLResponse)

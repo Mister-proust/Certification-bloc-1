@@ -1,6 +1,7 @@
 from Database.db import connection_postgres
 from typing import Optional
-
+from collections import defaultdict
+from decimal import Decimal
 
 def lecture_fichier_sql(filename: str) -> str:
     with open(filename, "r", encoding="utf-8") as file:
@@ -25,8 +26,6 @@ def generalite_data(dept_code: str, annee: Optional[int] = None, type_cancer: Op
         filtres.append(f"ec.\"Annee\" = {annee}")
     if type_cancer:
         filtres.append(f"ec.\"Type_cancer\" = '{type_cancer}'")
-
-    # Trouver l'endroit où injecter les filtres
     sql_parts = sql.split("WHERE")
     sql = sql_parts[0] + "WHERE " + " AND ".join(filtres) + " AND " + sql_parts[1]
     conn = connection_postgres()
@@ -51,3 +50,38 @@ def generalite_data(dept_code: str, annee: Optional[int] = None, type_cancer: Op
         for r in rows
     ]
 
+def graphiques_generalites(data):
+    types = {
+        "global": lambda x: True,
+        "autres": lambda x: x["type_cancer"] == "Autres cancers",
+        "sein": lambda x: x["type_cancer"] == "Cancer du sein de la femme",
+        "prostate": lambda x: x["type_cancer"] == "Cancer de la prostate",
+        "broncho": lambda x: x["type_cancer"] == "Cancer bronchopulmonaire",
+        "colorectal": lambda x: x["type_cancer"] == "Cancer colorectal"
+    }
+
+    result = {}
+    for key, filt in types.items():
+        stats = defaultdict(lambda: {"patients": 0, "population": 0, "substances": 0})
+        for row in filter(filt, data):
+            y = row["annee"]
+            stats[y]["patients"] += row["effectif_patients"]
+            stats[y]["population"] += row["effectif_total"]
+            stats[y]["substances"] += row["quantite_en_kg"] or 0
+
+        result[key] = {
+            "annees": sorted(stats),
+            "prevalences": [round(100 * stats[y]["patients"] / stats[y]["population"], 2) if stats[y]["population"] else 0 for y in sorted(stats)],
+            "substances": [round(stats[y]["substances"], 2) for y in sorted(stats)]
+        }
+    return result
+
+def convert_decimal(obj):
+    if isinstance(obj, dict):
+        return {k: convert_decimal(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_decimal(v) for v in obj]
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    else:
+        return obj

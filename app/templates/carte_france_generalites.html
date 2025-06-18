@@ -101,5 +101,91 @@
             <p style="margin-top: 1rem; color: #c62828;">Aucune donnée disponible pour ce filtre.</p>
         {% endif %}
     </div>
+
+    <div style="margin-top: 2rem;">
+    <label for="graph_type">Choisir un graphique :</label>
+    <select id="graph_type" onchange="updateGraph()" class="form-control" style="max-width: 300px; margin-bottom: 1rem;">
+        <option value="global">Tous les cancers</option>
+        <option value="autres">Autres cancers</option>
+        <option value="sein">Cancer du sein</option>
+        <option value="prostate">Cancer de la prostate</option>
+        <option value="broncho">Cancer bronchopulmonaire</option>
+        <option value="colorectal">Cancer colorectal</option>
+    </select>
+    <canvas id="graphCanvas" width="800" height="400"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const chartData = {{ graph_data | tojson }};
+    const ctx = document.getElementById('graphCanvas').getContext('2d');
+
+    let chart;
+
+    function updateGraph() {
+    const selected = document.getElementById('graph_type').value;
+    const data = chartData[selected];
+
+    const config = {
+        type: 'line',
+        data: {
+            labels: data.annees,
+            datasets: [
+                {
+                    label: 'Prévalence (%)',
+                    data: data.prevalences,
+                    yAxisID: 'y1',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                },
+                {
+                    label: 'Substances achetées (kg)',
+                    data: data.substances,
+                    yAxisID: 'y2',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y1: {
+                    type: 'linear',
+                    position: 'left',
+                    title: { display: true, text: 'Prévalence (%)' }
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    title: { display: true, text: 'Substances (kg)' },
+                    grid: { drawOnChartArea: false }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Évolution ${selected} - Prévalence et substances`
+                }
+            }
+        }
+    };
+
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, config);
+}
+
+
+    // Initialiser avec "global"
+    window.onload = updateGraph;
+</script>
+
 </div>
 {% endblock %}
