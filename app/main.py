@@ -25,9 +25,9 @@ app.mount("/static", StaticFiles(directory="./static"), name="static")
 
 sys.modules['main'].templates = templates
 
-app.include_router(carte_router)
-app.include_router(authentification_router)
 app.include_router(accueil_router)
+app.include_router(authentification_router)
+app.include_router(carte_router)
 app.include_router(substance_router)
 
 @app.exception_handler(StarletteHTTPException)

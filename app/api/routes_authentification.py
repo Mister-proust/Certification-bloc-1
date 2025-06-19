@@ -10,11 +10,11 @@ from services.authentification import get_db, authenticate_user, create_access_t
 
 router = APIRouter(tags=["Authentification"])
 
-@router.get("/login", response_class=HTMLResponse, name="login_page")
+@router.get("/login", response_class=HTMLResponse, name="login_page", summary="Page permettant de se logger pour accéder à plus de contenus sur l'application")
 async def login(request: Request, error: int=0):
     return templates.TemplateResponse("login.html", {"request": request, "nom_app": "Pesticancer", "error" : error})
 
-@router.post("/login")
+@router.post("/login", summary = "Gestion de l'authentification")
 async def login_for_access_token(
     request : Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -33,11 +33,11 @@ async def login_for_access_token(
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
 
-@router.get("/inscription", response_class=HTMLResponse)
+@router.get("/inscription", response_class=HTMLResponse, summary = "Page permettant de s'inscrire pour observer les données de l'application.")
 async def register_page(request: Request):
     return templates.TemplateResponse("inscription.html", {"request": request, "nom_app": "Pesticide_cancer"})
 
-@router.post("/inscription", response_class=HTMLResponse)
+@router.post("/inscription", response_class=HTMLResponse, summary = "Requêtes nécessaire pour l'inscription")
 async def register_user(
     request: Request,
     email: str = Form(...), 
@@ -66,7 +66,7 @@ async def register_user(
         {"request": request, "nom_app": "Pesticancer", "message": "Inscription réussie ! Vous pouvez maintenant vous connecter."}
     )
 
-@router.get("/deconnexion")
+@router.get("/deconnexion", summary="Permet la déconnexion de l'utilisateur de son compte.")
 async def logout():
     response = RedirectResponse(url="/", status_code=302)
     response.delete_cookie("access_token")

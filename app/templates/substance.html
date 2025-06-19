@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informations sur les substances</title>
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; 
+            padding-top: 60px; 
+        }
+
+        .topnav {
+            position: fixed; 
+            top: 0;
+            width: 100%;
+            z-index: 1000; 
+        }
+
+        .container {
+            max-width: 900px; 
+            margin: 20px auto; 
+            padding: 25px; 
+        }
+
+        h1 {
+            color: #2e7d32;
+            font-size: 2rem; 
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: #2e7d32; 
+            font-size: 1.6rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e8f5e9; 
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #2e7d32; 
+            font-size: 1.25rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        h4 {
+            color: #4CAF50; 
+            font-size: 1.1rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        label {
+            font-weight: 600; 
+            color: #4f4f4f; 
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #c8e6c9; 
+            background-color: #f8fdf8; 
+            font-size: 0.95rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: border-color 0.3s ease;
+        }
+        select:focus {
+            border-color: #2e7d32; 
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display : None ;
+        }
+        .loading-message {
+            color: #1b5e20; 
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display : None ; 
+        }
+
+        #details-section {
+            border-top: 2px solid #e8f5e9;
+            margin-top: 40px;
+            padding-top: 25px;
+        }
+        .info-block {
+            background-color: #ffffff; 
+            border: 1px solid #c8e6c9;
+            border-radius: 8px; 
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); 
+        }
+        .info-block h3 {
+            color: #2e7d32; 
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #d4e9d6; 
+            padding-bottom: 8px;
+            font-size: 1.4rem;
+        }
+        .info-block h4 {
+            color: #4CAF50; 
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .info-block p {
+            line-height: 1.7;
+            margin-bottom: 10px;
+            color: #3f3f3f;
+        }
+        #mol-url {
+            display: block;
+            margin-top: 30px;
+            text-align: right;
+            color: #2e7d32;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        #mol-url:hover {
+            color: #1b5e20; 
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+        <a href="/carte_france">Généralités</a>
+        <a href="/carte_age">Age</a>
+        <a href="/carte_sexe">Sexe</a>
+        <a class="active" href="/substance">Information sur les substances</a>
+        <a href="/deconnexion">Déconnexion</a>
+    </div>
+
+    <div class="container">
+        <h1>Recherche d'informations sur les molécules</h1>
+
+        <label for="mol_selector">Choisissez une molécule :</label>
+        <select id="mol_selector" onchange="getMolDetails()">
+            <option value="">Chargement des molécules...</option>
+        </select>
+
+        <div id="loading-display" class="loading-message"></div>
+        <div id="error-display" class="error-message"></div>
+        
+        <div id="details-section" style="display: none;">
+            <h2>Informations sur la molécule : <span id="mol-name-display"></span></h2>
+
+            <div class="info-block">
+                <h3>Description Générale</h3>
+                <p id="mol-info-block-content"></p>
+            </div>
+
+            <div class="info-block">
+                <h3>Toxicité chez les mammifères</h3>
+                <h4>Toxicité aiguë</h4>
+                <p id="mol-toxicite-aigue"></p>
+                <h4>Effets à long terme</h4>
+                <p id="mol-effets-long-terme"></p>
+            </div>
+
+            <div class="info-block">
+                <h3>Devenir et comportement dans l'environnement</h3>
+                <h4>Persistance</h4>
+                <p id="mol-persistance"></p>
+                <h4>Potentiel de lessivage</h4>
+                <p id="mol-lessivage"></p>
+            </div>
+
+            <p><a id="mol-url" href="#" target="_blank">Voir la source complète</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMoleculesIntoSelector();
+        });
+
+        async function loadMoleculesIntoSelector() {
+            const selector = document.getElementById('mol_selector');
+            const errorDisplay = document.getElementById('error-display');
+            const loadingDisplay = document.getElementById('loading-display');
+
+            selector.innerHTML = '<option value="">Chargement des molécules...</option>';
+            selector.disabled = true;
+            errorDisplay.textContent = '';
+            loadingDisplay.textContent = 'Chargement de la liste des molécules...';
+
+            try {
+                const response = await fetch('/substances/noms'); // Appel à l'API pour la liste des noms
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+
+                if (data.noms && data.noms.length > 0) {
+                    selector.innerHTML = '<option value="">-- Sélectionnez une molécule --</option>'; // Option par défaut
+                    data.noms.forEach(name => {
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.textContent = name;
+                        selector.appendChild(option);
+                    });
+                } else {
+                    selector.innerHTML = '<option value="">Aucune molécule trouvée</option>';
+                    errorDisplay.textContent = 'Aucune molécule trouvée dans la base de données.';
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement des molécules :", error);
+                errorDisplay.textContent = `Erreur lors du chargement de la liste : ${error.message}`;
+                selector.innerHTML = '<option value="">Erreur de chargement</option>';
+            } finally {
+                selector.disabled = false;
+                loadingDisplay.textContent = ''; // Cache le message de chargement
+            }
+        }
+
+        async function getMolDetails() {
+            const selector = document.getElementById('mol_selector');
+            const selectedMol = selector.value;
+            const errorDisplay = document.getElementById('error-display');
+            const loadingDisplay = document.getElementById('loading-display');
+            const detailsSection = document.getElementById('details-section'); // La nouvelle section principale
+            const molNameDisplay = document.getElementById('mol-name-display');
+            const molInfoBlockContent = document.getElementById('mol-info-block-content');
+            const molToxiciteAigue = document.getElementById('mol-toxicite-aigue');
+            const molEffetsLongTerme = document.getElementById('mol-effets-long-terme');
+            const molPersistance = document.getElementById('mol-persistance');
+            const molLessivage = document.getElementById('mol-lessivage');
+            const molUrl = document.getElementById('mol-url');
+
+            // Réinitialiser l'affichage
+            detailsSection.style.display = 'none'; // Cache la section de détails
+            errorDisplay.textContent = '';
+            loadingDisplay.textContent = '';
+
+            if (!selectedMol) {
+                return; // Ne fait rien si l'option par défaut est sélectionnée
+            }
+
+            loadingDisplay.textContent = `Chargement des détails de "${selectedMol}"...`;
+
+            try {
+                const response = await fetch(`/substances/${encodeURIComponent(selectedMol)}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `Erreur HTTP: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json();
+
+                // Remplir les éléments HTML avec les données
+                molNameDisplay.textContent = data.nom || 'N/A';
+                molInfoBlockContent.textContent = data.contenu_info_block || 'Non disponible.';
+                molToxiciteAigue.textContent = data.toxicite_aigue || 'Non disponible.';
+                molEffetsLongTerme.textContent = data.effets_long_terme || 'Non disponible.';
+                molPersistance.textContent = data.persistance || 'Non disponible.';
+                molLessivage.textContent = data.lessivage || 'Non disponible.';
+                
+                if (data.url) {
+                    molUrl.href = data.url;
+                    molUrl.style.display = 'block'; // Affiche le lien s'il y a une URL
+                } else {
+                    molUrl.style.display = 'none'; // Cache le lien s'il n'y a pas d'URL
+                }
+
+                detailsSection.style.display = 'block'; // Affiche la section de détails
+            } catch (error) {
+                console.error("Erreur lors de la récupération des détails :", error);
+                errorDisplay.textContent = `Erreur : ${error.message}`;
+                detailsSection.style.display = 'none'; // Cache les détails en cas d'erreur
+            } finally {
+                loadingDisplay.textContent = ''; // Cache le message de chargement
+            }
+        }
+    </script>
+</body>
+</html>
