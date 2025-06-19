@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Carte des départements</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+    <style>
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+  <a href="/carte_france">Généralités</a>
+  <a class="active" href="/carte_age">Age</a>
+  <a href="/carte_sexe">Sexe</a>
+  <a href="/substance">Information sur les substances</a>
+  <a href="/deconnexion">Déconnexion</a>
+</div>
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header">
+        Données pour le département {{ dept_code }} : {{ nom_departement }}
+    </div>
+    <div class="card-body">
+        <form method="get" class="mb-4" action="/carte_age/{{ dept_code }}">
+            <input type="hidden" name="dept_code" value="{{ dept_code }}">
+
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" for="annee">Année :</label>
+                    <select class="form-control" name="annee" id="annee">
+                        <option value="">Toutes</option>
+                        {% for y in range(2015, 2023) %}
+                            <option value="{{ y }}" {% if annee == y %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" for="type_cancer">Type de cancer :</label>
+                    <select class="form-control" name="type_cancer" id="type_cancer">
+                        <option value="">Tous</option>
+                        {% set types = ['Autres cancers', 'Cancer bronchopulmonaire', 'Cancer colorectal', 'Cancer de la prostate', 'Cancer du sein de la femme'] %}
+                        {% for c in types %}
+                            <option value="{{ c }}" {% if type_cancer == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" for="classe_age">Classe d'âge :</label>
+                    <select class="form-control" name="classe_age" id="classe_age">
+                         <option value="">Toutes</option>
+                            {% set classes_age = [
+                                'Moins de 5 ans',
+                                'De 5 à 9 ans',
+                                'De 10 à 14 ans',
+                                'De 15 à 19 ans',
+                                'De 20 à 24 ans',
+                                'De 25 à 29 ans',
+                                'De 30 à 34 ans',
+                                'De 35 à 39 ans',
+                                'De 40 à 44 ans',
+                                'De 45 à 49 ans',
+                                'De 50 à 54 ans',
+                                'De 55 à 59 ans',
+                                'De 60 à 64 ans',
+                                'De 65 à 69 ans',
+                                'De 70 à 74 ans',
+                                'De 75 à 79 ans',
+                                'De 80 à 84 ans',
+                                'De 85 à 89 ans',
+                                'De 90 à 94 ans',
+                                '95 ans ou plus'
+                            ] %}
+                            {% for age_class in classes_age %}
+                                <option value="{{ age_class }}" {% if classe_age == age_class %}selected{% endif %}>{{ age_class }}</option>
+                            {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-custom">Filtrer</button>
+        </form>
+
+        {% if (annee or type_cancer or age) and data %}
+        <div style="overflow-x: auto; margin-top: 1rem;">
+            <table>
+               <table style="
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: center;
+    ">
+        <thead style="background-color: #e8f5e9; color: #2e7d32;">
+            <tr>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Année</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Type cancer</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Patients</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Population</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Classe d'âge</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Prévalence (%)</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Substances chimiques achetées (kg)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding: 0.6rem;">{{ row.annee }}</td>
+                <td style="padding: 0.6rem;">{{ row.type_cancer }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_patients | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_total | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.classe_age }}</td>
+                <td style="padding: 0.6rem; text-align: right;">
+                    {% if row.prevalence_pourcentage is defined and row.prevalence_pourcentage is not none %}
+                        {{ row.prevalence_pourcentage | round(2) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.quantite_en_kg | round(2) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+            </table>
+        </div>
+        {% elif (annee or type_cancer or age) and not data %}
+            <p style="margin-top: 1rem; color: #c62828;">Aucune donnée disponible pour ce filtre.</p>
+        {% endif %}
+    </div>
+
+<div style="margin-top: 2rem; padding: 20px; border-top: 1px solid #ddd;">
+            <h3>Graphique par classe d'âge et type de cancer</h3>
+            
+            <div class="graph-controls">
+                <div class="control-group">
+                    <label for="graph_age_select">Classes d'âge :</label>
+                    <select id="graph_age_select" multiple class="form-control">
+                        <!-- Options seront ajoutées par JavaScript -->
+                    </select>
+                    <small>Maintenez Ctrl pour sélectionner plusieurs classes</small>
+                </div>
+                
+                <div class="control-group">
+                    <label for="graph_cancer_select">Types de cancer :</label>
+                    <select id="graph_cancer_select" multiple class="form-control">
+                        <!-- Options seront ajoutées par JavaScript -->
+                    </select>
+                    <small>Maintenez Ctrl pour sélectionner plusieurs types</small>
+                </div>
+            </div>
+            
+            <button onclick="updateAgeGraph()" class="btn-custom">Mettre à jour le graphique</button>
+            
+            <div style="margin-top: 20px;">
+                <canvas id="ageGraphCanvas" width="800" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ageChartData = {{ graph_data | tojson }};
+        const ageCtx = document.getElementById('ageGraphCanvas').getContext('2d');
+        let ageChart;
+
+        // Couleurs pour les différentes séries
+        const colors = [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)', 
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(199, 199, 199, 1)',
+            'rgba(83, 102, 255, 1)'
+        ];
+
+        function initializeSelects() {
+            const ageSelect = document.getElementById('graph_age_select');
+            const cancerSelect = document.getElementById('graph_cancer_select');
+            
+            // Remplir les sélecteurs avec les données disponibles
+            if (ageChartData.classes_age) {
+                ageChartData.classes_age.forEach(age => {
+                    const option = document.createElement('option');
+                    option.value = age;
+                    option.textContent = age;
+                    ageSelect.appendChild(option);
+                });
+            }
+            
+            if (ageChartData.types_cancer) {
+                ageChartData.types_cancer.forEach(cancer => {
+                    const option = document.createElement('option');
+                    option.value = cancer;
+                    option.textContent = cancer;
+                    cancerSelect.appendChild(option);
+                });
+            }
+            
+            // Sélectionner les premiers éléments par défaut
+            if (ageSelect.options.length > 0) ageSelect.options[0].selected = true;
+            if (cancerSelect.options.length > 0) cancerSelect.options[0].selected = true;
+        }
+
+        function updateAgeGraph() {
+            const selectedAges = Array.from(document.getElementById('graph_age_select').selectedOptions).map(opt => opt.value);
+            const selectedCancers = Array.from(document.getElementById('graph_cancer_select').selectedOptions).map(opt => opt.value);
+            
+            if (selectedAges.length === 0 || selectedCancers.length === 0) {
+                alert('Veuillez sélectionner au moins une classe d\'âge et un type de cancer');
+                return;
+            }
+
+            const datasets = [];
+            let colorIndex = 0;
+
+            // Créer les datasets pour les prévalences
+            selectedAges.forEach(age => {
+                selectedCancers.forEach(cancer => {
+                    const key = `${age}_${cancer}`;
+                    if (ageChartData.data && ageChartData.data[key]) {
+                        const data = ageChartData.data[key];
+                        datasets.push({
+                            label: `Prévalence: ${age} - ${cancer} (%)`,
+                            data: data.prevalences,
+                            yAxisID: 'y1',
+                            borderColor: colors[colorIndex % colors.length],
+                            backgroundColor: colors[colorIndex % colors.length].replace('1)', '0.2)'),
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        });
+                        colorIndex++;
+                    }
+                });
+            });
+
+            // Ajouter une seule courbe pour les substances (indépendante de l'âge/cancer)
+            if (ageChartData.substances && ageChartData.substances.length > 0) {
+                datasets.push({
+                    label: 'Substances chimiques achetées (kg)',
+                    data: ageChartData.substances,
+                    yAxisID: 'y2',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderDash: [5, 5], // Style pointillé pour distinguer des prévalences
+                    borderWidth: 3 // Plus épais pour bien la distinguer
+                });
+            }
+
+            const config = {
+                type: 'line',
+                data: {
+                    labels: ageChartData.annees || [],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y1: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { 
+                                display: true, 
+                                text: 'Prévalence (%)' 
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { 
+                                display: true, 
+                                text: 'Substances achetées (kg)' 
+                            },
+                            grid: { 
+                                drawOnChartArea: false 
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Évolution par classe d\'âge et type de cancer - Prévalence et substances'
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            };
+
+            if (ageChart) ageChart.destroy();
+            ageChart = new Chart(ageCtx, config);
+        }
+
+        // Initialiser au chargement de la page
+        window.onload = function() {
+            initializeSelects();
+            updateAgeGraph();
+        };
+</script>
+
+</div>
+{% endblock %}

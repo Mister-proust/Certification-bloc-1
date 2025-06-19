@@ -64,7 +64,7 @@
             <button type="submit" class="btn-custom">Filtrer</button>
         </form>
 
-        {% if (annee or type_cancer or sexe) and data %}
+        {% if (annee or type_cancer or age) and data %}
         <div style="overflow-x: auto; margin-top: 1rem;">
             <table>
                <table style="
@@ -107,7 +107,7 @@
         </tbody>
             </table>
         </div>
-        {% elif (annee or type_cancer or sexe) and not data %}
+        {% elif (annee or type_cancer or age) and not data %}
             <p style="margin-top: 1rem; color: #c62828;">Aucune donnée disponible pour ce filtre.</p>
         {% endif %}
     </div>
