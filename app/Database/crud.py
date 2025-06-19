@@ -60,20 +60,35 @@ def graphiques_generalites(data):
     }
 
     result = {}
+
     for key, filt in types.items():
-        stats = defaultdict(lambda: {"patients": 0, "population": 0, "substances": 0})
+        stats = defaultdict(lambda: {
+            "patients": 0,
+            "population": 0,
+            "substances": set()  # ✅ correction ici
+        })
+
         for row in filter(filt, data):
             y = row["annee"]
             stats[y]["patients"] += row["effectif_patients"]
             stats[y]["population"] += row["effectif_total"]
-            stats[y]["substances"] += row["quantite_en_kg"] or 0
+            stats[y]["substances"].add(row["quantite_en_kg"])
 
+        annees = sorted(stats)
         result[key] = {
-            "annees": sorted(stats),
-            "prevalences": [round(100 * stats[y]["patients"] / stats[y]["population"], 2) if stats[y]["population"] else 0 for y in sorted(stats)],
-            "substances": [round(stats[y]["substances"], 2) for y in sorted(stats)]
+            "annees": annees,
+            "prevalences": [
+                round(100 * stats[y]["patients"] / stats[y]["population"], 2)
+                if stats[y]["population"] else 0
+                for y in annees
+            ],
+            "substances": [
+                round(sum(q for q in stats[y]["substances"] if q is not None), 2)
+                for y in annees
+            ]
         }
     return result
+
 
 def convert_decimal(obj):
     if isinstance(obj, dict):
@@ -137,7 +152,7 @@ def graphiques_sexe(data):
         stats = defaultdict(lambda: {
             "M": {"patients": 0, "population": 0},
             "F": {"patients": 0, "population": 0},
-            "substances": 0
+            "substances": set()  # utiliser un set pour ne pas additionner plusieurs fois
         })
 
         for row in filter(filt, data):
@@ -145,7 +160,8 @@ def graphiques_sexe(data):
             sexe = row["sexe"]
             stats[y][sexe]["patients"] += row["effectif_patients"]
             stats[y][sexe]["population"] += row["effectif_total"]
-            stats[y]["substances"] += row["quantite_en_kg"] or 0
+            # Ajout unique d'une valeur de substance par an
+            stats[y]["substances"].add((row["annee"], row["quantite_en_kg"]))
 
         annees = sorted(stats)
         result[key] = {
@@ -161,7 +177,7 @@ def graphiques_sexe(data):
                 for y in annees
             ],
             "substances": [
-                round(stats[y]["substances"], 2)
+                round(sum(q for _, q in stats[y]["substances"]), 2) if stats[y]["substances"] else 0
                 for y in annees
             ]
         }

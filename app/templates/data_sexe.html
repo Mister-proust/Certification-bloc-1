@@ -27,7 +27,7 @@
         Données pour le département {{ dept_code }} : {{ nom_departement }}
     </div>
     <div class="card-body">
-        <form method="get" class="mb-4">
+        <form method="get" class="mb-4" action="/carte_sexe/{{ dept_code }}">
             <input type="hidden" name="dept_code" value="{{ dept_code }}">
 
             <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
@@ -65,6 +65,48 @@
         </form>
 
         {% if (annee or type_cancer or sexe) and data %}
+        <div style="overflow-x: auto; margin-top: 1rem;">
+            <table>
+               <table style="
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: center;
+    ">
+        <thead style="background-color: #e8f5e9; color: #2e7d32;">
+            <tr>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Année</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Type cancer</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Patients</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Population</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Prévalence (%)</th>
+                <th style="padding: 0.8rem; border-bottom: 1px solid #c8e6c9;">Substances chimiques achetées (kg)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding: 0.6rem;">{{ row.annee }}</td>
+                <td style="padding: 0.6rem;">{{ row.type_cancer }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_patients | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.effectif_total | round(0) }}</td>
+                <td style="padding: 0.6rem; text-align: right;">
+                    {% if row.prevalence_pourcentage is defined and row.prevalence_pourcentage is not none %}
+                        {{ row.prevalence_pourcentage | round(2) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="padding: 0.6rem; text-align: right;">{{ row.quantite_en_kg | round(2) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+            </table>
+        </div>
         {% elif (annee or type_cancer or sexe) and not data %}
             <p style="margin-top: 1rem; color: #c62828;">Aucune donnée disponible pour ce filtre.</p>
         {% endif %}

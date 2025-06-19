@@ -41,7 +41,7 @@
                         const nom = feature.properties.nom;
                         layer.bindPopup(`${nom} (${code})`);
                         layer.on('click', () => {
-                            window.location.href = `/carte_france/${code}`;
+                            window.location.href = `/carte_sexe/${code}`;
                         });
                     },
                     style: {

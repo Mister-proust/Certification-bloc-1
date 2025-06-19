@@ -14,8 +14,9 @@ async def read_map(request: Request, user=Depends(get_current_user)):
 @router.get("/carte_france/{dept_code}", response_class=HTMLResponse)
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user)):
     data = generalite_data(dept_code, annee, type_cancer)  
+    data_graphique = data_sexe(dept_code)
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
-    graph_data = graphiques_generalites(data)
+    graph_data = graphiques_generalites(data_graphique)
     graph_data_converti = convert_decimal(graph_data)
 
     return templates.TemplateResponse("carte_france_generalites.html", {
@@ -40,8 +41,9 @@ async def carte_sexe(request: Request, user=Depends(get_current_user)):
 @router.get("/carte_sexe/{dept_code}", response_class=HTMLResponse)
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user), sexe: Optional[str] = Query(None)):
     data = data_sexe(dept_code, annee, type_cancer, sexe)  
+    data_graphique = data_sexe(dept_code)
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
-    graph_data = graphiques_sexe(data)
+    graph_data = graphiques_sexe(data_graphique)
     graph_data_converti = convert_decimal(graph_data)
 
     return templates.TemplateResponse("data_sexe.html", {
