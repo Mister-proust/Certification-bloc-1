@@ -145,17 +145,13 @@
                 <div class="control-group">
                     <label for="graph_age_select">Classes d'âge :</label>
                     <select id="graph_age_select" multiple class="form-control">
-                        <!-- Options seront ajoutées par JavaScript -->
                     </select>
-                    <small>Maintenez Ctrl pour sélectionner plusieurs classes</small>
                 </div>
                 
                 <div class="control-group">
                     <label for="graph_cancer_select">Types de cancer :</label>
                     <select id="graph_cancer_select" multiple class="form-control">
-                        <!-- Options seront ajoutées par JavaScript -->
                     </select>
-                    <small>Maintenez Ctrl pour sélectionner plusieurs types</small>
                 </div>
             </div>
             
@@ -173,7 +169,6 @@
         const ageCtx = document.getElementById('ageGraphCanvas').getContext('2d');
         let ageChart;
 
-        // Couleurs pour les différentes séries
         const colors = [
             'rgba(54, 162, 235, 1)',
             'rgba(255, 99, 132, 1)', 
@@ -189,7 +184,6 @@
             const ageSelect = document.getElementById('graph_age_select');
             const cancerSelect = document.getElementById('graph_cancer_select');
             
-            // Remplir les sélecteurs avec les données disponibles
             if (ageChartData.classes_age) {
                 ageChartData.classes_age.forEach(age => {
                     const option = document.createElement('option');
@@ -208,7 +202,6 @@
                 });
             }
             
-            // Sélectionner les premiers éléments par défaut
             if (ageSelect.options.length > 0) ageSelect.options[0].selected = true;
             if (cancerSelect.options.length > 0) cancerSelect.options[0].selected = true;
         }
@@ -225,7 +218,6 @@
             const datasets = [];
             let colorIndex = 0;
 
-            // Créer les datasets pour les prévalences
             selectedAges.forEach(age => {
                 selectedCancers.forEach(cancer => {
                     const key = `${age}_${cancer}`;
@@ -246,7 +238,6 @@
                 });
             });
 
-            // Ajouter une seule courbe pour les substances (indépendante de l'âge/cancer)
             if (ageChartData.substances && ageChartData.substances.length > 0) {
                 datasets.push({
                     label: 'Substances chimiques achetées (kg)',
@@ -257,8 +248,8 @@
                     tension: 0.3,
                     pointRadius: 4,
                     pointHoverRadius: 6,
-                    borderDash: [5, 5], // Style pointillé pour distinguer des prévalences
-                    borderWidth: 3 // Plus épais pour bien la distinguer
+                    borderDash: [5, 5], 
+                    borderWidth: 3 
                 });
             }
 
@@ -314,8 +305,6 @@
             if (ageChart) ageChart.destroy();
             ageChart = new Chart(ageCtx, config);
         }
-
-        // Initialiser au chargement de la page
         window.onload = function() {
             initializeSelects();
             updateAgeGraph();

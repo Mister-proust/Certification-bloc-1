@@ -222,16 +222,11 @@ def data_age(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[
 
 
 def graphiques_age(data):
-    # Organiser les données par année, classe d'âge et type de cancer
     stats = defaultdict(lambda: defaultdict(lambda: {
         "patients": 0, 
         "population": 0
     }))
-    
-    # Substances par année (déduplication par année uniquement)
     substances_by_year = {}
-    
-    # Collecter toutes les classes d'âge et types de cancer disponibles
     classes_age = set()
     types_cancer = set()
     
@@ -246,16 +241,11 @@ def graphiques_age(data):
         key = f"{classe_age}_{type_cancer}"
         stats[annee][key]["patients"] += row["effectif_patients"]
         stats[annee][key]["population"] += row["effectif_total"]
-        
-        # Substances par année (prendre une seule fois par année, pas par ligne)
         if annee not in substances_by_year:
             quantite = row["quantite_en_kg"]
             substances_by_year[annee] = float(quantite) if quantite is not None else 0.0
-    
-    # Trier les années
+
     annees = sorted(stats.keys())
-    
-    # Créer la structure de données pour le graphique
     result = {
         "annees": annees,
         "classes_age": sorted(list(classes_age)),
@@ -263,8 +253,6 @@ def graphiques_age(data):
         "substances": [round(substances_by_year.get(annee, 0), 2) for annee in annees],
         "data": {}
     }
-    
-    # Pour chaque combinaison classe d'âge + type de cancer
     for classe_age in classes_age:
         for type_cancer in types_cancer:
             key = f"{classe_age}_{type_cancer}"
