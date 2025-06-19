@@ -1,8 +1,7 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from fastapi.requests import Request
-from fastapi.responses import RedirectResponse, HTMLResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 import sys
 from api.routes_carte_france import router as carte_router
 from api.routes_authentification import router as authentification_router
