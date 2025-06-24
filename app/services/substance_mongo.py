@@ -32,7 +32,7 @@ def extraire_infos(nom_produit: str):
         "url": doc.get("url"),
         "contenu_info_block": None,
         "toxicite_aigue": None,
-        "effets_long_terme": None,  # FAUTE DE FRAPPE CORRIGÉE ICI : "effets_long_termefs" -> "effets_long_terme"
+        "effets_long_terme": None,  
         "persistance": None,
         "lessivage": None
     }
@@ -69,7 +69,6 @@ def extraire_infos(nom_produit: str):
 
     return resultat
 
-# La fonction lister_noms_produits() reste inchangée et est correcte
 def lister_noms_produits():
     """
     Retourne une liste triée de tous les noms de produits uniques dans la collection.
