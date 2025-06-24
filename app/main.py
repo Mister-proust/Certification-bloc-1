@@ -12,6 +12,9 @@ from starlette.responses import RedirectResponse
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 from services.templates import templates 
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
+from services.authentification import delete_inactive_users
 
 
 app = FastAPI(
@@ -39,3 +42,13 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("static/favicon.ico")
+
+
+scheduler = BackgroundScheduler()
+
+scheduler.add_job(delete_inactive_users, 'cron', hour=0, minute=0)
+scheduler.start()
+
+@app.on_event("shutdown")
+def shutdown_event():
+    scheduler.shutdown()

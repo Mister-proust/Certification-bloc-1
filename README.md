@@ -1,5 +1,10 @@
 # Certification-bloc-1
 
+# Configuration du .env
+
+# Présenter les différentes composantes et dossiers
+
+# Installation du requirements.txt
 
 # Sources
 

@@ -4,9 +4,10 @@ import os
 from model.models import  MetadataAge 
 from sqlmodel import Session
 
-
+# Chargement des variables d'environnement depuis le fichier .env
 load_dotenv(dotenv_path="../.env", override=True)
 
+# Paramètres de connexion à la base de données PostgreSQL
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
 HOST = os.getenv("HOST_POSTGRES")
@@ -15,11 +16,19 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
-
-# Ajout des lignes dans la table. 
+ 
 def run(): 
+    """
+    Fonction principale qui :
+    - Insère des métadonnées d'âges dans la table MetadataAge.
+    - Ces métadonnées permettent de regrouper les classes d'âge et de leur associer un âge médian.
+    """
+
     with Session(engine) as session: 
+        # Sélection du schéma dans PostgreSQL
         session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+
+        # Données à insérer : codes d'âge, libellés et âges médians associés
         data_to_insert= [
             {"Code": "Y_LT20", "Libelle": "0 à 19 ans", "Age_median": "10"},
             {"Code": "Y20T39", "Libelle": "De 20 à 39 ans","Age_median": "30"},
@@ -50,10 +59,12 @@ def run():
             {"Code": "_T", "Libelle": "Total", "Age_median" : None}
         ]
         
+        # Création et insertion des objets MetadataAge
         for item_data in data_to_insert:
             metadata_age = MetadataAge(**item_data)
             session.add(metadata_age)
         
+        # Validation de l'insertion
         session.commit()
 
         print("metadata_age inséré avec succès")

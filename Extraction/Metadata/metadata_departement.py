@@ -4,22 +4,33 @@ import os
 from model.models import  MetadataDepartement
 from sqlmodel import Session
 
-
+# Chargement des variables d'environnement depuis le fichier .env   
 load_dotenv(dotenv_path="../.env", override=True)
 
+# Paramètres de connexion à la base de données PostgreSQL
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
 HOST = os.getenv("HOST_POSTGRES")
 PORT = os.getenv("PORT_POSTGRES")
 DATABASE = os.getenv("DATABASE_POSTGRES")
 
+# Construction de l'URL de connexion PostgreSQL
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
 # Ajout des lignes dans la table. 
 def run(): 
+    """
+    Fonction principale qui :
+    - Insère la liste des départements français et des zones particulières
+      dans la table MetadataDepartement.
+    - Ces métadonnées permettent de référencer les territoires dans l'application.
+    """
     with Session(engine) as session: 
+        # Sélection du schéma PostgreSQL ciblé
         session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+
+        # Liste des départements et zones à insérer
         data_to_insert= [
             {"Code": "1", "Libelle": "Ain"},
             {"Code": "2", "Libelle": "Aisne"},
@@ -132,10 +143,12 @@ def run():
             {"Code": "F", "Libelle": "France"}
         ]
         
+        # Insertion des données dans la base
         for item_data in data_to_insert:
             metadata_departement = MetadataDepartement(**item_data)
             session.add(metadata_departement)
         
+        # Validation des insertions
         session.commit()
         print("metadata_departement inséré avec succès")
 

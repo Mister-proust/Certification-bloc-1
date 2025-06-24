@@ -4,8 +4,10 @@ import os
 from sqlmodel import Session
 from model.models import  MetadataAnnee
 
+# Chargement des variables d'environnement depuis le fichier .env
 load_dotenv(dotenv_path="../.env", override=True)
 
+# Paramètres de connexion à la base de données PostgreSQL
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
 HOST = os.getenv("HOST_POSTGRES")
@@ -15,10 +17,18 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-# Ajout des lignes dans la table.
 def run(): 
+    """
+    Fonction principale qui :
+    - Insère les métadonnées des années dans la table MetadataAnnee.
+    - Ces métadonnées permettent de référencer les années disponibles dans l'application.
+    """
      with Session(engine) as session: 
+
+        # Sélection du schéma PostgreSQL ciblé
         session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+
+        # Liste des années à insérer sous forme de dictionnaires
         data_to_insert= [
             {"Code": "1990", "Libelle": "1990"},
             {"Code": "1991", "Libelle": "1991"},
@@ -57,10 +67,13 @@ def run():
             {"Code": "2024", "Libelle": "2024"},
             {"Code": "2025", "Libelle": "2025"}
         ]
+
+        # Insertion des lignes dans la table
         for item_data in data_to_insert:
             metadata_annee = MetadataAnnee(**item_data)
             session.add(metadata_annee)
         
+        # Validation des insertions
         session.commit()
         print("metadata_annee inséré avec succès")
 

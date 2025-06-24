@@ -38,6 +38,7 @@ class Utilisateurs(Base):
     prenom = Column(String, nullable=False)
     date_naissance = Column(Date, nullable=False)
     is_active = Column(Boolean, default=True)
+    last_activity = Column(Date, default=datetime.utcnow)
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
@@ -66,6 +67,8 @@ def authenticate_user(db: Session, email: str, password: str):
     user = get_user(db, email)
     if not user or not verify_password(password, user.hashed_password):
         return None
+    user.last_activity = datetime.utcnow()
+    db.commit()
     return user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -102,5 +105,15 @@ async def get_current_user(
     if not user:
         raise credentials_exception
     return user
+
+def delete_inactive_users():
+    db = SessionLocal()
+    one_year_ago = datetime.utcnow() - timedelta(days=365)
+    inactive_users = db.query(Utilisateurs).filter(Utilisateurs.last_activity < one_year_ago).all()
+
+    for user in inactive_users:
+        db.delete(user)
+    db.commit()
+    db.close()
 
 create_tables()
