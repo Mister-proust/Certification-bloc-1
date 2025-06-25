@@ -3,6 +3,7 @@ from sqlmodel import Field, SQLModel
 from datetime import date
 from decimal import Decimal
 
+# === METADATA === #
 
 class MetadataAge(SQLModel, table=True): 
     __tablename__="metadata_age"
@@ -11,7 +12,7 @@ class MetadataAge(SQLModel, table=True):
     Age_median : Optional[int] = Field(nullable=True)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataAge(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataAge(id={self.Code}, libelle={self.Libelle})"
 
 class MetadataAnnee(SQLModel, table=True): 
     __tablename__="metadata_annee"
@@ -19,7 +20,7 @@ class MetadataAnnee(SQLModel, table=True):
     Libelle : str = Field(max_length=64)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataAnnee(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataAnnee(id={self.Code}, libelle={self.Libelle})"
 
 class MetadataSexe(SQLModel, table=True): 
     __tablename__="metadata_sexe"
@@ -27,7 +28,7 @@ class MetadataSexe(SQLModel, table=True):
     Libelle : str = Field(max_length=64)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataSexe(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataSexe(id={self.Code}, libelle={self.Libelle})"
 
 class MetadataDepartement(SQLModel, table=True): 
     __tablename__="metadata_departement"
@@ -35,7 +36,7 @@ class MetadataDepartement(SQLModel, table=True):
     Libelle : str = Field(max_length=64)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataDepartement(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataDepartement(id={self.Code}, libelle={self.Libelle})"
 
 class MetadataObsStatus(SQLModel, table=True): 
     __tablename__="metadata_obs_status"
@@ -43,7 +44,7 @@ class MetadataObsStatus(SQLModel, table=True):
     Libelle : str = Field(max_length=64)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataObsStatus(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataObsStatus(id={self.Code}, libelle={self.Libelle})"
 
 class MetadataStats(SQLModel, table=True): 
     __tablename__="metadata_stats"
@@ -51,7 +52,10 @@ class MetadataStats(SQLModel, table=True):
     Libelle : str = Field(max_length=256)
     __table_args__ = {"schema": "Pollution_Cancer"}
     def __repr__(self):
-        return f"MetadataStats(id={self.code}, libelle={self.Libelle})"
+        return f"MetadataStats(id={self.Code}, libelle={self.Libelle})"
+    
+
+# === TABLES PRINCIPALES === #
 
 class EffectifCancer(SQLModel, table=True):
     __tablename__ = "Effectif_cancer"

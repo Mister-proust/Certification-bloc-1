@@ -4,32 +4,45 @@ import os
 from model.models import  MetadataSexe
 from sqlmodel import Session
 
-
+# Chargement des variables d'environnement
 load_dotenv(dotenv_path="../.env", override=True)
 
+# Paramètres de connexion PostgreSQL
 USER = os.getenv("USER_POSTGRES")
 PASSWORD = os.getenv("PASSWORD_POSTGRES")
 HOST = os.getenv("HOST_POSTGRES")
 PORT = os.getenv("PORT_POSTGRES")
 DATABASE = os.getenv("DATABASE_POSTGRES")
 
+# Construction de l'URL de connexion
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-# Ajout des lignes dans la table. 
 def run() : 
+    """
+    Insère dans la table Metadata_sexe les statuts :
+    - Hommes
+    - Femmes
+    - Total
+    Ces statuts permettent de qualifier le sexe des effectifs.
+    """
     with Session(engine) as session: 
+        # Sélection du schéma PostgreSQL ciblé
         session.exec(text(f'SET search_path TO "Pollution_Cancer";'))
+
+        # Données à insérer
         data_to_insert= [
             {"Code": "M", "Libelle": "Hommes"},
             {"Code": "F", "Libelle": "Femmes"},
             {"Code": "_T", "Libelle": "Total"}
         ]
 
+        # Insertion des données
         for item_data in data_to_insert:
             metadata_sexe = MetadataSexe(**item_data)
             session.add(metadata_sexe)
         
+        # Validation des insertions
         session.commit()
         print("metadata_sexe inséré avec succès")
 

@@ -10,6 +10,12 @@ from datetime import datetime
 
 
 def setup_logging():
+    """
+    Configure le système de logging pour enregistrer les logs dans un fichier et dans la console.
+    
+    Retourne:
+        logger (Logger): Instance de logger configurée.
+    """
     os.makedirs("../logs", exist_ok=True)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -31,7 +37,14 @@ def setup_logging():
     return logger
 
 class SagePesticidesScraper:
+    """
+    Scraper pour extraire les informations des substances actives depuis le site Sage Pesticides.
+    """
+
     def __init__(self):
+        """
+        Initialise la session de scraping avec des headers personnalisés.
+        """
         self.base_url = "https://www.sagepesticides.qc.ca"
         self.search_url = f"{self.base_url}/Recherche/RechercheMatiere"
         self.session = requests.Session()
@@ -43,6 +56,12 @@ class SagePesticidesScraper:
         self.logger = logging.getLogger(__name__)
 
     def get_substances_actives(self):
+        """
+        Récupère la liste des substances actives disponibles sur le site.
+
+        Retourne:
+            list: Liste des substances sous forme de dictionnaires {id, nom}.
+        """
         self.logger.info("Récupération des substances actives...")
         try:
             response = self.session.get(self.search_url)
@@ -65,6 +84,15 @@ class SagePesticidesScraper:
             return []
 
     def extract_table_data(self, table):
+        """
+        Extrait les données structurées d'un tableau HTML.
+
+        Args:
+            table (Tag): Élément BeautifulSoup correspondant à un tableau HTML.
+
+        Retourne:
+            dict: Structure du tableau sous forme de dictionnaire.
+        """
         if not table:
             return {}
         rows = table.find_all('tr')
@@ -97,6 +125,15 @@ class SagePesticidesScraper:
         return structured
 
     def extract_info_blocks(self, soup):
+        """
+        Extrait les blocs d'information textuels présents sur la page de détail d'une substance.
+
+        Args:
+            soup (BeautifulSoup): Contenu HTML de la page.
+
+        Retourne:
+            list: Liste des blocs d'informations avec leur titre, contenu et liens associés.
+        """
         blocks = soup.find_all('div', class_='form-group border-green blocInfos')
         infos = []
 
@@ -117,6 +154,16 @@ class SagePesticidesScraper:
         return infos
 
     def get_substance_details(self, substance_id, substance_name):
+        """
+        Récupère toutes les informations détaillées d'une substance donnée.
+
+        Args:
+            substance_id (str): Identifiant de la substance.
+            substance_name (str): Nom de la substance.
+
+        Retourne:
+            dict: Dictionnaire contenant les informations textuelles et tabulaires de la substance.
+        """
         self.logger.info(f"Récupération des données textuelles de : {substance_name}")
         try:
             url = f"{self.base_url}/Recherche/RechercheMatiere/DisplayMatiere?MatiereActiveID={substance_id}&searchText={quote(substance_name)}&isProduct=False"
@@ -144,6 +191,16 @@ class SagePesticidesScraper:
             return None
 
     def scrape_all(self, max_substances=None, delay=1):
+        """
+        Scrape toutes les substances actives disponibles.
+
+        Args:
+            max_substances (int, optionnel): Nombre maximum de substances à scraper. Si None, toutes les substances sont récupérées.
+            delay (int, optionnel): Temps de pause entre chaque requête pour éviter de surcharger le serveur.
+
+        Retourne:
+            list: Liste des données collectées pour chaque substance.
+        """
         self.logger.info("Début du scraping complet...")
         substances = self.get_substances_actives()
         if not substances:
@@ -165,6 +222,13 @@ class SagePesticidesScraper:
         return results
 
     def save_to_json(self, data, filename="infos_substances.json"):
+        """
+        Sauvegarde les données récupérées dans un fichier JSON.
+
+        Args:
+            data (list): Liste des substances récupérées.
+            filename (str, optionnel): Nom du fichier JSON.
+        """
         try:
             os.makedirs("../data", exist_ok=True)
             filepath = os.path.join("../data", filename)
@@ -175,6 +239,9 @@ class SagePesticidesScraper:
             self.logger.error(f"Erreur de sauvegarde : {e}")
 
 def main():
+    """
+    Fonction principale : initialise le logger, exécute le scraping et sauvegarde les résultats.
+    """
     logger = setup_logging()
     try:
         scraper = SagePesticidesScraper()
