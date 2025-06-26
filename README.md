@@ -57,7 +57,7 @@ COLLECTION_MONGO="votrecollectionmongo"
 ```
 
 
-## Présenter les différentes composantes et dossiers
+## Présentation des différents dossiers
 
 Créer un fichier Data dans lequel vous devrez télécharger les fichiers CSV indiqués dans Sources ci-dessous. 
 
