@@ -14,7 +14,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from services.templates import templates 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
-from services.authentification import delete_inactive_users
+from services.authentification import delete_inactive_users, create_tables
 
 
 app = FastAPI(
@@ -52,3 +52,5 @@ scheduler.start()
 @app.on_event("shutdown")
 def shutdown_event():
     scheduler.shutdown()
+
+create_tables()
