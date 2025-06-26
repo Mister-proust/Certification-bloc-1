@@ -13,6 +13,7 @@ async def read_map(request: Request, user=Depends(get_current_user)):
 
 @router.get("/carte_france/{dept_code}", response_class=HTMLResponse, summary="Données départementales générales sur le cancer et l'achat de pesticides")
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user)):
+    dept_code = str(int(dept_code))
     data = generalite_data(dept_code, annee, type_cancer)  
     data_graphique = data_sexe(dept_code)
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
@@ -36,6 +37,7 @@ async def carte_age(request: Request, user=Depends(get_current_user)):
 
 @router.get("/carte_age/{dept_code}", response_class=HTMLResponse, summary = "Affichage des données autour des classes d'âges sur les pesticides et le cancer.")
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user), classe_age: Optional[str] = Query(None)):
+    dept_code = str(int(dept_code))
     data = data_age(dept_code, annee, type_cancer, classe_age)  
     data_graphique = data_age(dept_code)
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
@@ -61,6 +63,7 @@ async def carte_sexe(request: Request, user=Depends(get_current_user)):
 
 @router.get("/carte_sexe/{dept_code}", response_class=HTMLResponse, summary = "Données sur les achats de pesticides et la prévalence du cancer entre les hommes et les femmes.")
 async def departement (request: Request, dept_code: str, annee: Optional[str] = Query(None), type_cancer: Optional[str] = Query(None), user=Depends(get_current_user), sexe: Optional[str] = Query(None)):
+    dept_code = str(int(dept_code))
     data = data_sexe(dept_code, annee, type_cancer, sexe)  
     data_graphique = data_sexe(dept_code)
     nom_departement = data[0]["nom_departement"] if data else "Inconnu"
