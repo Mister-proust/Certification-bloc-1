@@ -53,4 +53,7 @@ scheduler.start()
 def shutdown_event():
     scheduler.shutdown()
 
-create_tables()
+@app.on_event("startup")
+def startup_event():
+    # Création automatique des tables et des schémas si nécessaire
+    create_tables()

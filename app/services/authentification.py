@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, create_engine, Date
+from sqlalchemy import Column, Integer, String, Boolean, create_engine, Date, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from passlib.context import CryptContext
@@ -46,10 +46,17 @@ class Utilisateurs(Base):
     is_active = Column(Boolean, default=True)
     last_activity = Column(Date, default=datetime.utcnow)
 
+#Créer le schéma s'il n'existe pas
+def create_schema():
+    with engine.connect() as connexion : 
+        connexion.execute(text('CREATE SCHEMA IF NOT EXISTS "Authentification"'))
+        connexion.commit()
+
 def create_tables():
     """
     Crée les tables dans la base de données si elles n'existent pas.
     """
+    create_schema()
     Base.metadata.create_all(bind=engine)
 
 # Configuration du gestionnaire de mots de passe avec bcrypt
@@ -69,16 +76,9 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
-     """
-    Hash un mot de passe en utilisant bcrypt.
+     return pwd_context.hash(password)
 
-    Args:
-        password (str): Mot de passe en clair.
 
-    Retourne:
-        str: Mot de passe hashé.
-    """
-    return pwd_context.hash(password)
 
 def get_db():
     """
@@ -203,6 +203,3 @@ def delete_inactive_users():
         db.delete(user)
     db.commit()
     db.close()
-
-# Création automatique des tables lors de l'importation du fichier
-create_tables()
