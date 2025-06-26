@@ -17,6 +17,13 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 def setup_logging():
+    """
+    Configure le système de logs. 
+    Crée un fichier de logs horodaté et configure l'affichage des logs dans le terminal.
+
+    Retourne:
+        logger: Instance du logger configuré.
+    """
     os.makedirs("logs", exist_ok=True)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -40,6 +47,17 @@ def setup_logging():
     return logger
 
 def execute_step(step_name, step_function, logger):
+    """
+    Exécute une étape de traitement et mesure son temps d'exécution.
+
+    Args:
+        step_name (str): Nom de l'étape en cours.
+        step_function (function): Fonction à exécuter.
+        logger: Logger pour afficher les informations et erreurs.
+
+    Retourne:
+        tuple: (bool succès, résultat ou None)
+    """
     logger.info(f"Début de l'insertion de - {step_name}")
     start_time = time.time()
     
@@ -60,6 +78,12 @@ def execute_step(step_name, step_function, logger):
         return False, None
     
 def log_database_info(logger):
+    """
+    Affiche les informations de connexion à la base de données dans les logs.
+
+    Args:
+        logger: Logger pour afficher les informations.
+    """
     try:
         load_dotenv()
         db_host = os.getenv('DB_HOST', 'localhost')
@@ -73,7 +97,13 @@ def log_database_info(logger):
 
 
 def main():
-
+   """
+    Fonction principale qui orchestre :
+    - La création des tables en base de données.
+    - L'insertion des métadonnées.
+    - L'insertion des données CSV et API.
+    - La gestion des logs et du suivi d'exécution.
+    """
    logger = setup_logging()
    total_start_time = time.time()
    steps_success = 0
