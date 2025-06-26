@@ -4,10 +4,41 @@ from collections import defaultdict
 from decimal import Decimal
 
 def lecture_fichier_sql(filename: str) -> str:
+    """
+    Lit et retourne le contenu d'un fichier SQL donné.
+
+    Args:
+        filename (str): Chemin vers le fichier SQL à lire.
+
+    Returns:
+        str: Contenu texte du fichier SQL.
+    """
     with open(filename, "r", encoding="utf-8") as file:
         return file.read()
 
 def generalite_data(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[str] = None):
+    """
+    Récupère les données générales sur les cancers et l'utilisation de pesticides pour un département donné,
+    avec des filtres optionnels par année et type de cancer.
+
+    Args:
+        dept_code (str): Code du département.
+        annee (Optional[int]): Année de filtrage (optionnel).
+        type_cancer (Optional[str]): Type de cancer (optionnel).
+
+    Returns:
+        list[dict]: Liste de dictionnaires avec les données suivantes :
+            - annee
+            - departement
+            - nom_departement
+            - type_cancer
+            - classe_age
+            - sexe
+            - effectif_patients
+            - effectif_total
+            - prevalence_pourcentage (float ou None)
+            - quantite_en_kg (pesticides)
+    """
     sql = lecture_fichier_sql("Database/sql/generalite_sql.sql")
     filtres = []
     filtres.append(f"ec.\"Departement\" = '{dept_code}'")
@@ -40,6 +71,19 @@ def generalite_data(dept_code: str, annee: Optional[int] = None, type_cancer: Op
     ]
 
 def graphiques_generalites(data):
+    """
+    Prépare les données agrégées pour générer des graphiques de prévalence et de substances
+    par type de cancer et année à partir des données brutes.
+
+    Args:
+        data (list[dict]): Liste des données renvoyées par `generalite_data`.
+
+    Returns:
+        dict: Structure regroupant pour chaque type de cancer :
+            - annees (list)
+            - prevalences (list) : en pourcentage
+            - substances (list) : quantité totale en kg
+    """
     types = {
         "global": lambda x: True,
         "autres": lambda x: x["type_cancer"] == "Autres cancers",
@@ -81,6 +125,15 @@ def graphiques_generalites(data):
 
 
 def convert_decimal(obj):
+    """
+    Convertit récursivement les objets Decimal en float dans une structure dict/liste.
+
+    Args:
+        obj: Objet pouvant être un dict, list, Decimal ou autre.
+
+    Returns:
+        Objet équivalent avec Decimal convertis en float.
+    """
     if isinstance(obj, dict):
         return {k: convert_decimal(v) for k, v in obj.items()}
     elif isinstance(obj, list):
@@ -92,6 +145,18 @@ def convert_decimal(obj):
     
 
 def data_sexe(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[str] = None, sexe: Optional[str] = None):
+    """
+    Récupère les données segmentées par sexe sur un département donné, avec filtres optionnels.
+
+    Args:
+        dept_code (str): Code département.
+        annee (Optional[int]): Année (optionnel).
+        type_cancer (Optional[str]): Type de cancer (optionnel).
+        sexe (Optional[str]): Sexe ("M" ou "F", optionnel).
+
+    Returns:
+        list[dict]: Données similaires à `generalite_data` avec filtre sexe.
+    """
     sql = lecture_fichier_sql("Database/sql/sexe.sql")
     filtres = []
     filtres.append(f"ec.\"Departement\" = '{dept_code}'")
@@ -127,6 +192,16 @@ def data_sexe(dept_code: str, annee: Optional[int] = None, type_cancer: Optional
 
 
 def graphiques_sexe(data):
+    """
+    Prépare les données agrégées pour des graphiques segmentés par sexe et type de cancer,
+    incluant prévalences et quantités de substances.
+
+    Args:
+        data (list[dict]): Données issues de `data_sexe`.
+
+    Returns:
+        dict: Pour chaque type de cancer, liste des années, prévalences hommes, prévalences femmes et substances.
+    """
     types = {
         "global": lambda x: True,
         "autres": lambda x: x["type_cancer"] == "Autres cancers",
@@ -176,6 +251,18 @@ def graphiques_sexe(data):
 
 
 def data_age(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[str] = None, classe_age: Optional[str] = None):
+    """
+    Récupère les données segmentées par classe d'âge, avec filtres sur département, année, type de cancer et classe d'âge.
+
+    Args:
+        dept_code (str): Code département.
+        annee (Optional[int]): Année (optionnel).
+        type_cancer (Optional[str]): Type de cancer (optionnel).
+        classe_age (Optional[str]): Classe d'âge (optionnel).
+
+    Returns:
+        list[dict]: Données avec clés similaires aux autres fonctions, ajout de "classe_age" et "Code_âge".
+    """
     sql = lecture_fichier_sql("Database/sql/age.sql")
     filtres = []
     filtres.append(f"ec.\"Departement\" = '{dept_code}'")
@@ -212,6 +299,21 @@ def data_age(dept_code: str, annee: Optional[int] = None, type_cancer: Optional[
 
 
 def graphiques_age(data):
+    """
+    Prépare les données pour des graphiques détaillés selon classes d'âge et types de cancer,
+    avec calcul des prévalences et quantités de substances pour chaque combinaison année-classe d'âge-type de cancer.
+
+    Args:
+        data (list[dict]): Données issues de `data_age`.
+
+    Returns:
+        dict: Contient
+            - annees (list)
+            - classes_age (list)
+            - types_cancer (list)
+            - substances (list) : quantités totales par année
+            - data (dict) : clés "classeAge_typeCancer" avec listes des prévalences par année
+    """
     stats = defaultdict(lambda: defaultdict(lambda: {
         "patients": 0, 
         "population": 0
