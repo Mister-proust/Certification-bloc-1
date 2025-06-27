@@ -98,7 +98,7 @@ def get_data(api_type: str, annee_min: int = 2013, annee_max: int = 2025):
     return pd.DataFrame(all_data)
 
 def retirer_zero(code_str):
-     """
+    """
     Supprime les zéros non significatifs au début des codes.
 
     Args:
@@ -112,7 +112,7 @@ def retirer_zero(code_str):
     return code_str
 
 def clean_produits(df):
-      """
+    """
     Nettoie et prépare les données des produits avant insertion en base.
 
     Args:
@@ -181,7 +181,7 @@ def insert_sqlmodel_objects(df: pd.DataFrame, model_class, session: Session, bat
         session.commit()
 
 def get_existing_amm(engine) -> set:
-     """
+    """
     Récupère la liste des AMM déjà existants dans la table 'amm_produits'.
 
     Args:

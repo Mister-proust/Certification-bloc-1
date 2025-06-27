@@ -24,6 +24,16 @@ engine = create_engine(DATABASE_URL)
 # Nom du schéma PostgreSQL
 schema = "Pollution_Cancer" 
 
+def reset_schema():
+    """
+    Supprime complètement le schéma (et donc toutes les tables et leurs données)
+    puis le recrée vide.
+    """
+    with engine.connect() as conn:
+        conn.execute(text(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE;'))  
+        conn.commit()
+        print(f"Schéma {schema} supprimé avec succès.")
+
 def create_db_and_tables():
     """
     Crée le schéma et les tables nécessaires dans la base de données PostgreSQL.

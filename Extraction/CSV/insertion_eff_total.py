@@ -24,8 +24,8 @@ database = DATABASE
 schema = "Pollution_Cancer"
 table = "Effectif_departement"
 
-def run(): 
-     """
+def run():
+    """
     Fonction principale qui :
     - Charge les données démographiques depuis un fichier CSV
     - Nettoie et restructure les données

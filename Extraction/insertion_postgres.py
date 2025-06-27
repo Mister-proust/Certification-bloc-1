@@ -8,7 +8,7 @@ from CSV.insertion_postgres_amm import run as run_amm
 from CSV.nettoyage_insertion_postgres_cancer import run as run_cancer
 from CSV.insertion_eff_total import run as run_eff_total
 from API.Extraction_stockage_achat import run as run_api_achat
-from model.db_init import create_db_and_tables
+from model.db_init import create_db_and_tables, reset_schema
 import os
 import logging
 import time
@@ -113,6 +113,17 @@ def main():
    try : 
        log_database_info(logger)
 
+       # Étape de reset du schéma
+       logger.info(f"Réinitialisation complète du schéma en cours...")
+       success, _ = execute_step(f"Réinitialisation du schéma ", reset_schema, logger)
+       steps_total += 1
+       if success:
+            steps_success += 1
+       else:
+            failed_steps.append("Réinitialisation du schéma")
+            logger.critical("Arrêt du processus - Impossible de réinitialiser le schéma")
+            return
+
        logger.info(f"Création des tables de données en cours...")
        success, _ = execute_step("Tables vides avec contraintes en cours de création...", create_db_and_tables, logger)
        steps_total += 1
@@ -125,12 +136,12 @@ def main():
 
        logger.info("Insertion des métadatas en cours ...")
        metadata_insertion = [
-         run_obs_status(),
-         run_stats(),
-         run_sexe(),
-         run_departement(),
-         run_annee(),
-         run_age(),]
+         ("Insertion obs_status", run_obs_status),
+    ("Insertion stats", run_stats),
+    ("Insertion sexe", run_sexe),
+    ("Insertion departement", run_departement),
+    ("Insertion annee", run_annee),
+    ("Insertion age", run_age),]
        for step_name, step_function in metadata_insertion:
             success, _ = execute_step(step_name, step_function, logger)
             steps_total += 1
@@ -141,10 +152,10 @@ def main():
 
        logger.info("Insertion des métadatas terminée, insertion des données amm, effectif et cancer en cours...")
        data_insertion = [
-      run_amm(),
-      run_cancer(),
-      run_eff_total(),
-      run_api_achat(),]
+      ("Insertion AMM", run_amm),
+    ("Insertion cancer", run_cancer),
+    ("Insertion effectif total", run_eff_total),
+    ("Insertion API achat", run_api_achat),]
 
        for step_name, step_function in data_insertion:
                success, _ = execute_step(step_name, step_function, logger)

@@ -70,9 +70,9 @@ Dans le dossier Rapport, vous trouverez le rapport en format docs et PDF.
 Dans le dossier Extraction, vous retrouverez plusieurs dossiers. Le premier dossier API contient le script permettant de récupérer les données provenant de l'API ainsi qu'un Notebook d'analyse.
 Dans le dossier CSV, on va retrouver les notebooks d'analyse ainsi que 3 fichiers permettant d'extraire et nettoyer les données du CSV. 
 Dans le dossier Metadata on retrouvera les différents scripts correspondant aux codes nécessaires pour faire le lien entre les tables ou améliorer la compréhension de certaines tables.
-Dans le dossier model, on va retrouver le fichier db_init qui va intialiser la base de données. Il faut lancer ce script en premier. L'autre script models.py correspond aux différentes tables qui seront présents dans la base de données. 
+Dans le dossier model, on va retrouver le fichier db_init qui va intialiser la base de données. L'autre script models.py correspond aux différentes tables qui seront présents dans la base de données. 
 Enfin, le dossier scrapping va comporter le script permettant de scrapper le site web et enregistrera un fichier json qui sera présent dans /data et qu'il faudra mettre dans mongoDB après.
-Enfin, un fichier insertion_postgres.py va prendre en compte les scripts précédemments nommés pour mettre les informations dans Postgres. Il faut donc lancer ce script après avoir lancé le script models.py. 
+Enfin, un fichier insertion_postgres.py va prendre en compte les scripts précédemments nommés pour mettre les informations dans Postgres. 
 
 
 # Sources

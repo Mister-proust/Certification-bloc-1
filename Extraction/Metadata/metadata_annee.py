@@ -17,8 +17,8 @@ DATABASE = os.getenv("DATABASE_POSTGRES")
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
 engine = create_engine(DATABASE_URL)
 
-def run(): 
-    """
+def run():
+     """
     Fonction principale qui :
     - Insère les métadonnées des années dans la table MetadataAnnee.
     - Ces métadonnées permettent de référencer les années disponibles dans l'application.
